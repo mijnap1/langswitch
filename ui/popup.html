@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LangSwitch Settings</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="panel">
+    <h1>LangSwitch</h1>
+
+    <label class="field">
+      <span>Language</span>
+      <select id="language">
+        <option value="korean">Korean (Dubeolsik)</option>
+        <option value="spanish">Spanish (Accents/N)</option>
+        <option value="french">French (Accent Restore)</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Context Mode</span>
+      <select id="contextMode">
+        <option value="strict">Strict (few conversions)</option>
+        <option value="balanced">Balanced</option>
+        <option value="aggressive">Aggressive (more conversions)</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Tooltip Theme</span>
+      <select id="tooltipTheme">
+        <option value="liquid-glass">Liquid Glass</option>
+        <option value="soft-minimal">Soft Minimal</option>
+        <option value="arctic-frost">Arctic Frost</option>
+        <option value="obsidian-edge">Obsidian Edge</option>
+        <option value="warm-paper">Warm Paper</option>
+        <option value="moss-satin">Moss Satin</option>
+        <option value="sunset-clay">Sunset Clay</option>
+        <option value="mono-ink">Mono Ink</option>
+        <option value="neon-pulse">Neon Pulse</option>
+        <option value="terminal">Terminal</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Appearance</span>
+      <select id="appearance">
+        <option value="auto">Auto (System)</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+
+    <label class="toggle">
+      <input type="checkbox" id="autoConvert" />
+      <span>Auto-convert on Space/Enter/Tab</span>
+    </label>
+
+    <label class="toggle site-toggle">
+      <input type="checkbox" id="siteEnabled" />
+      <span id="siteToggleLabel">Enable on this site</span>
+    </label>
+
+    <p id="status" aria-live="polite"></p>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

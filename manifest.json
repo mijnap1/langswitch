@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "LangSwitch",
+  "version": "0.2.0",
+  "description": "Detect mistyped keyboard layout and suggest local conversion.",
+  "icons": {
+    "16": "assets/logo.png",
+    "32": "assets/logo.png",
+    "48": "assets/logo.png",
+    "128": "assets/logo.png"
+  },
+  "permissions": ["activeTab", "storage", "tabs"],
+  "action": {
+    "default_title": "LangSwitch Settings",
+    "default_icon": {
+      "16": "assets/logo.png",
+      "32": "assets/logo.png",
+      "48": "assets/logo.png",
+      "128": "assets/logo.png"
+    },
+    "default_popup": "ui/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["scripts/converter.js", "scripts/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["data/english-words.txt"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
