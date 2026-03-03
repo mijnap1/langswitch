@@ -95,7 +95,15 @@
     if (!(target instanceof Element)) return null;
 
     const contentEditable = target.closest("[contenteditable='true'], [contenteditable='plaintext-only']");
-    return contentEditable instanceof HTMLElement ? contentEditable : null;
+    if (contentEditable instanceof HTMLElement) return contentEditable;
+
+    const root = target.getRootNode ? target.getRootNode() : null;
+    if (root instanceof ShadowRoot && root.host instanceof HTMLElement) {
+      if (isPlainInput(root.host)) return root.host;
+      if (root.host.isContentEditable) return root.host;
+    }
+
+    return null;
   }
 
   function isSupportedInput(target) {
@@ -612,13 +620,13 @@
   }
 
   document.addEventListener("input", (e) => {
-    const el = getEditableTarget(e.target);
+    const el = getEditableTarget(e.target) || getEditableTarget(document.activeElement);
     if (!isSupportedInput(el)) return;
     maybeShowSuggestion(el);
-  });
+  }, true);
 
   document.addEventListener("keydown", (e) => {
-    const el = getEditableTarget(e.target);
+    const el = getEditableTarget(e.target) || getEditableTarget(document.activeElement);
     if (!isSupportedInput(el)) return;
     if (e.isComposing) return;
     if (!isEnabledOnCurrentSite()) {
@@ -648,7 +656,7 @@
 
     replaceRange(el, wordInfo.start, wordInfo.end, converted);
     removeSuggestion();
-  });
+  }, true);
 
   document.addEventListener("click", removeSuggestion);
 
