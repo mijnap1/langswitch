@@ -329,6 +329,7 @@
     tooltip.style.padding = "8px 12px";
     tooltip.style.fontSize = "12px";
     tooltip.style.fontWeight = "700";
+    tooltip.style.fontFamily = "'Poppins', 'Inter', 'Segoe UI', sans-serif";
     tooltip.style.letterSpacing = "0.15px";
     tooltip.style.lineHeight = "1.2";
     tooltip.style.zIndex = "999999";
