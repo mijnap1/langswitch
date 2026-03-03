@@ -77,7 +77,7 @@
     }
   }
 
-  function isSupportedInput(el) {
+  function isPlainInput(el) {
     if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) {
       return false;
     }
@@ -88,6 +88,18 @@
 
     const supportedTypes = new Set(["", "text", "search", "url", "tel", "email", "password"]);
     return supportedTypes.has(el.type);
+  }
+
+  function getEditableTarget(target) {
+    if (isPlainInput(target)) return target;
+    if (!(target instanceof Element)) return null;
+
+    const contentEditable = target.closest("[contenteditable='true'], [contenteditable='plaintext-only']");
+    return contentEditable instanceof HTMLElement ? contentEditable : null;
+  }
+
+  function isSupportedInput(target) {
+    return Boolean(getEditableTarget(target));
   }
 
   function isEnabledOnCurrentSite() {
@@ -322,7 +334,7 @@
     tooltip.style.zIndex = "999999";
     applyTooltipTheme(tooltip);
 
-    const rect = element.getBoundingClientRect();
+    const rect = getTooltipAnchorRect(element);
     tooltip.style.top = `${rect.bottom + window.scrollY + 6}px`;
     tooltip.style.left = `${rect.left + window.scrollX}px`;
 
@@ -330,11 +342,51 @@
     lastSuggestion = { element, suggestion };
   }
 
+  function getTooltipAnchorRect(el) {
+    if (isPlainInput(el)) {
+      return el.getBoundingClientRect();
+    }
+
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0).cloneRange();
+      range.collapse(true);
+      const rect = range.getBoundingClientRect();
+      if (rect && (rect.width || rect.height)) {
+        return rect;
+      }
+    }
+
+    return el.getBoundingClientRect();
+  }
+
+  function getEditableText(el) {
+    if (isPlainInput(el)) return el.value;
+    return el.textContent || "";
+  }
+
+  function getCaretOffset(el) {
+    if (isPlainInput(el)) {
+      return typeof el.selectionStart === "number" ? el.selectionStart : null;
+    }
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    const range = sel.getRangeAt(0);
+    if (!el.contains(range.endContainer)) return null;
+
+    const preCaret = range.cloneRange();
+    preCaret.selectNodeContents(el);
+    preCaret.setEnd(range.endContainer, range.endOffset);
+    return preCaret.toString().length;
+  }
+
   function getWordBeforeCaret(el) {
-    const caret = el.selectionStart;
+    const caret = getCaretOffset(el);
     if (caret === null || caret === undefined) return null;
 
-    const beforeCaret = el.value.slice(0, caret);
+    const text = getEditableText(el);
+    const beforeCaret = text.slice(0, caret);
     const match = beforeCaret.match(/[A-Za-z';~]{2,}$/);
     if (!match) return null;
 
@@ -347,10 +399,10 @@
   }
 
   function getCurrentWordAtCaret(el) {
-    const caret = el.selectionStart;
+    const caret = getCaretOffset(el);
     if (caret === null || caret === undefined) return null;
 
-    const value = el.value;
+    const value = getEditableText(el);
     const left = value.slice(0, caret);
     const right = value.slice(caret);
 
@@ -377,8 +429,9 @@
 
   function hasHangulAround(el, start, end) {
     const left = Math.max(0, start - 16);
-    const right = Math.min(el.value.length, end + 16);
-    return /[\uac00-\ud7a3]/i.test(el.value.slice(left, right));
+    const text = getEditableText(el);
+    const right = Math.min(text.length, end + 16);
+    return /[\uac00-\ud7a3]/i.test(text.slice(left, right));
   }
 
   function getConvertedWord(word) {
@@ -466,9 +519,73 @@
   }
 
   function replaceRange(el, start, end, replacement) {
-    el.focus();
-    el.setSelectionRange(start, end);
-    el.setRangeText(replacement, start, end, "end");
+    if (isPlainInput(el)) {
+      el.focus();
+      el.setSelectionRange(start, end);
+      el.setRangeText(replacement, start, end, "end");
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+
+    replaceRangeInContentEditable(el, start, end, replacement);
+  }
+
+  function getTextNodes(root) {
+    const nodes = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode();
+    while (node) {
+      nodes.push(node);
+      node = walker.nextNode();
+    }
+    return nodes;
+  }
+
+  function resolveTextPosition(root, offset) {
+    const nodes = getTextNodes(root);
+    if (nodes.length === 0) {
+      return { node: root, offset: 0 };
+    }
+
+    let remaining = offset;
+    for (const node of nodes) {
+      const len = node.textContent ? node.textContent.length : 0;
+      if (remaining <= len) {
+        return { node, offset: remaining };
+      }
+      remaining -= len;
+    }
+
+    const last = nodes[nodes.length - 1];
+    const lastLen = last.textContent ? last.textContent.length : 0;
+    return { node: last, offset: lastLen };
+  }
+
+  function replaceRangeInContentEditable(el, start, end, replacement) {
+    const text = getEditableText(el);
+    const boundedStart = Math.max(0, Math.min(start, text.length));
+    const boundedEnd = Math.max(boundedStart, Math.min(end, text.length));
+    const startPos = resolveTextPosition(el, boundedStart);
+    const endPos = resolveTextPosition(el, boundedEnd);
+
+    const range = document.createRange();
+    range.setStart(startPos.node, startPos.offset);
+    range.setEnd(endPos.node, endPos.offset);
+    range.deleteContents();
+
+    const inserted = document.createTextNode(replacement);
+    range.insertNode(inserted);
+
+    const caret = document.createRange();
+    caret.setStart(inserted, inserted.textContent ? inserted.textContent.length : 0);
+    caret.collapse(true);
+
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(caret);
+    }
+
     el.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
@@ -494,13 +611,13 @@
   }
 
   document.addEventListener("input", (e) => {
-    const el = e.target;
+    const el = getEditableTarget(e.target);
     if (!isSupportedInput(el)) return;
     maybeShowSuggestion(el);
   });
 
   document.addEventListener("keydown", (e) => {
-    const el = e.target;
+    const el = getEditableTarget(e.target);
     if (!isSupportedInput(el)) return;
     if (e.isComposing) return;
     if (!isEnabledOnCurrentSite()) {
