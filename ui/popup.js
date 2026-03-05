@@ -5,6 +5,7 @@
     tooltipTheme: "liquid-glass",
     appearance: "auto",
     autoConvert: true,
+    koreanSlangMode: true,
     siteRules: {}
   };
 
@@ -13,11 +14,18 @@
   const themeEl = document.getElementById("tooltipTheme");
   const appearanceEl = document.getElementById("appearance");
   const autoConvertEl = document.getElementById("autoConvert");
+  const koreanSlangModeEl = document.getElementById("koreanSlangMode");
+  const koreanSlangRowEl = document.getElementById("koreanSlangRow");
   const siteEnabledEl = document.getElementById("siteEnabled");
   const siteToggleLabelEl = document.getElementById("siteToggleLabel");
   const statusEl = document.getElementById("status");
   let currentHost = null;
   let loadedSettings = { ...DEFAULT_SETTINGS };
+
+  function updateLanguageDependentUI() {
+    const isKorean = languageEl.value === "korean";
+    koreanSlangRowEl.style.display = isKorean ? "" : "none";
+  }
 
   function showStatus(message) {
     statusEl.textContent = message;
@@ -62,7 +70,9 @@
     themeEl.value = loadedSettings.tooltipTheme;
     appearanceEl.value = loadedSettings.appearance;
     autoConvertEl.checked = Boolean(loadedSettings.autoConvert);
+    koreanSlangModeEl.checked = Boolean(loadedSettings.koreanSlangMode);
     renderSiteToggle();
+    updateLanguageDependentUI();
   }
 
   async function saveSettings() {
@@ -72,6 +82,7 @@
       tooltipTheme: themeEl.value,
       appearance: appearanceEl.value,
       autoConvert: autoConvertEl.checked,
+      koreanSlangMode: koreanSlangModeEl.checked,
       siteRules: loadedSettings.siteRules || {}
     };
 
@@ -88,7 +99,12 @@
     showStatus("Site rule saved");
   }
 
-  [languageEl, contextModeEl, themeEl, appearanceEl, autoConvertEl].forEach((el) => {
+  languageEl.addEventListener("change", () => {
+    updateLanguageDependentUI();
+    saveSettings();
+  });
+
+  [contextModeEl, themeEl, appearanceEl, autoConvertEl, koreanSlangModeEl].forEach((el) => {
     el.addEventListener("change", saveSettings);
   });
   siteEnabledEl.addEventListener("change", saveSiteRule);

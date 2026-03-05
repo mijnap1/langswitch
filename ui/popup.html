@@ -8,12 +8,17 @@
 </head>
 <body>
   <main class="panel">
-    <h1>LangSwitch</h1>
+    <div class="header">
+      <img src="../assets/logo.png" alt="LangSwitch" class="logo" />
+      <h1>LangSwitch</h1>
+    </div>
 
     <label class="field">
       <span>Language</span>
       <select id="language">
         <option value="korean">Korean (Dubeolsik)</option>
+        <option value="chinese">Chinese (Pinyin)</option>
+        <option value="japanese">Japanese (Romaji)</option>
         <option value="spanish">Spanish (Accents/N)</option>
         <option value="french">French (Accent Restore)</option>
       </select>
@@ -56,6 +61,11 @@
     <label class="toggle">
       <input type="checkbox" id="autoConvert" />
       <span>Auto-convert on Space/Enter/Tab</span>
+    </label>
+
+    <label class="toggle" id="koreanSlangRow">
+      <input type="checkbox" id="koreanSlangMode" />
+      <span>Korean slang mode (ㅇㅇ / ㅇㅋ / ㄱㄱ)</span>
     </label>
 
     <label class="toggle site-toggle">

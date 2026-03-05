@@ -3,12 +3,476 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LangSwitch Test</title>
+  <title>LangSwitch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:  #0a0a0a;
+      --gray-1: #444;
+      --gray-2: #888;
+      --gray-3: #bbb;
+      --gray-4: #e8e8e8;
+      --gray-5: #f5f5f5;
+      --white:  #fff;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--white);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 80px 32px 120px;
+    }
+
+    /* ── Hero ───────────────────────────────────────────── */
+    .hero {
+      margin-bottom: 80px;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 600;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      font-size: 14px;
+      color: var(--gray-1);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    kbd {
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: var(--gray-5);
+      border: 1px solid var(--gray-4);
+      border-bottom: 2px solid #d0d0d0;
+      border-radius: 5px;
+      padding: 1px 7px 2px;
+      color: var(--black);
+    }
+
+    /* ── Section shared ─────────────────────────────────── */
+    .section {
+      margin-bottom: 72px;
+      position: relative;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+    }
+
+    .section-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .section-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+    }
+
+    .section-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gray-2);
+    }
+
+    .section-glyph {
+      font-size: 36px;
+      line-height: 1;
+      opacity: 0.08;
+      font-weight: 400;
+      user-select: none;
+    }
+
+    .section-hint {
+      font-size: 12.5px;
+      color: var(--gray-2);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    /* ── Examples ───────────────────────────────────────── */
+    .examples {
+      margin-bottom: 20px;
+    }
+
+    .example-row {
+      display: grid;
+      grid-template-columns: 180px 130px 1fr;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-4);
+    }
+
+    .example-row:last-child { border-bottom: none; }
+
+    .ex-input code {
+      font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+      font-size: 12px;
+      background: var(--gray-5);
+      padding: 3px 8px;
+      border-radius: 5px;
+      letter-spacing: 0.2px;
+    }
+
+    .ex-output {
+      color: var(--black);
+    }
+
+    .ex-meaning {
+      font-size: 12px;
+      color: var(--gray-2);
+      text-align: right;
+    }
+
+    /* ── Textarea ───────────────────────────────────────── */
+    .field-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: var(--gray-2);
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--black);
+      background: var(--gray-5);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 16px 18px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+      min-height: 88px;
+    }
+
+    textarea:focus {
+      background: var(--white);
+      border-color: var(--black);
+    }
+
+    textarea::placeholder { color: var(--gray-3); }
+
+    /* ══════════════════════════════════════════════════════
+       KOREAN  — bold, blocky, punchy
+       ══════════════════════════════════════════════════════ */
+    .section-ko .section-header {
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 16px;
+    }
+
+    .section-ko .section-header h2 {
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .section-ko .section-tag {
+      letter-spacing: 1.5px;
+    }
+
+    .section-ko .ex-output {
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    .section-ko textarea {
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CHINESE  — structured, classical, spacious
+       ══════════════════════════════════════════════════════ */
+    .section-zh .section-header {
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 16px;
+    }
+
+    .section-zh .section-header h2 {
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .section-zh .section-tag {
+      letter-spacing: 1.5px;
+    }
+
+    .section-zh .example-row {
+      padding: 13px 0;
+    }
+
+    .section-zh .ex-output {
+      font-size: 19px;
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+
+    .section-zh textarea {
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       JAPANESE  — minimal, airy, precise
+       ══════════════════════════════════════════════════════ */
+    .section-ja .section-header {
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 16px;
+    }
+
+    .section-ja .section-header h2 {
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .section-ja .section-tag {
+      letter-spacing: 1.5px;
+    }
+
+    .section-ja .example-row {
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section-ja .ex-output {
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      color: var(--gray-1);
+    }
+
+    .section-ja .ex-input code {
+      background: none;
+      padding: 0;
+      color: var(--gray-2);
+      font-size: 11.5px;
+    }
+
+    .section-ja .ex-meaning {
+      color: var(--gray-3);
+    }
+
+    .section-ja textarea {
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .section-ja textarea:focus {
+      border-color: var(--gray-2);
+    }
+  </style>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; line-height: 1.4;">
-  <h2>LangSwitch Textarea Test</h2>
-  <p>Type English-key Korean and press space after each word.</p>
-  <p>Example: <code>sks wlrma anjgkrh dlTek</code></p>
-  <textarea rows="10" cols="80" placeholder="Type here..."></textarea>
+<body>
+  <div class="page">
+
+    <!-- Hero -->
+    <header class="hero">
+      <h1>LangSwitch</h1>
+      <p>Type naturally using your keyboard layout. LangSwitch detects mistyped input and converts it on the fly — press <kbd>Space</kbd> to auto-convert, or <span style="white-space:nowrap"><kbd>Alt L</kbd></span> to apply a suggestion manually.</p>
+    </header>
+
+    <!-- Korean -->
+    <section class="section section-ko">
+      <div class="section-header">
+        <div class="section-left">
+          <h2>Korean</h2>
+          <span class="section-tag">Dubeolsik</span>
+        </div>
+        <span class="section-glyph">한</span>
+      </div>
+      <p class="section-hint">Type as if your keyboard were in Dubeolsik layout. Press <kbd>Space</kbd> after each word.</p>
+      <div class="examples">
+        <div class="example-row">
+          <div class="ex-input"><code>dkssudgktpdy</code></div>
+          <div class="ex-output">안녕하세요</div>
+          <div class="ex-meaning">Hello (formal)</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>sks wlrma</code></div>
+          <div class="ex-output">난 지금</div>
+          <div class="ex-meaning">I right now</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>rkatk</code></div>
+          <div class="ex-output">감사</div>
+          <div class="ex-meaning">Thanks</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>zz</code></div>
+          <div class="ex-output">ㅋㅋ</div>
+          <div class="ex-meaning">LOL</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>gg</code></div>
+          <div class="ex-output">ㅎㅎ</div>
+          <div class="ex-meaning">Hehe</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>dz</code></div>
+          <div class="ex-output">ㅇㅋ</div>
+          <div class="ex-meaning">OK (slang)</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>rt</code></div>
+          <div class="ex-output">ㄱㅅ</div>
+          <div class="ex-meaning">Thanks (slang)</div>
+        </div>
+      </div>
+      <p class="field-label">Try it</p>
+      <textarea placeholder="Type Korean keys here…"></textarea>
+    </section>
+
+    <!-- Chinese -->
+    <section class="section section-zh">
+      <div class="section-header">
+        <div class="section-left">
+          <h2>Chinese</h2>
+          <span class="section-tag">Pinyin</span>
+        </div>
+        <span class="section-glyph">汉</span>
+      </div>
+      <p class="section-hint">Type pinyin without spaces or tone marks. Use <code style="font-family:'SF Mono','Menlo',monospace;font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px">v</code> in place of ü — e.g. <code style="font-family:'SF Mono','Menlo',monospace;font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px">nv</code> → 女.</p>
+      <div class="examples">
+        <div class="example-row">
+          <div class="ex-input"><code>nihao</code></div>
+          <div class="ex-output">你好</div>
+          <div class="ex-meaning">Hello</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>xiexie</code></div>
+          <div class="ex-output">谢谢</div>
+          <div class="ex-meaning">Thank you</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>zaijian</code></div>
+          <div class="ex-output">再见</div>
+          <div class="ex-meaning">Goodbye</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>woaini</code></div>
+          <div class="ex-output">我爱你</div>
+          <div class="ex-meaning">I love you</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>nv</code></div>
+          <div class="ex-output">女</div>
+          <div class="ex-meaning">Woman</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>lv</code></div>
+          <div class="ex-output">旅</div>
+          <div class="ex-meaning">Travel</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>meitian</code></div>
+          <div class="ex-output">每天</div>
+          <div class="ex-meaning">Every day</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>duoshaoqian</code></div>
+          <div class="ex-output">多少钱</div>
+          <div class="ex-meaning">How much?</div>
+        </div>
+      </div>
+      <p class="field-label">Try it</p>
+      <textarea placeholder="Type pinyin here…"></textarea>
+    </section>
+
+    <!-- Japanese -->
+    <section class="section section-ja">
+      <div class="section-header">
+        <div class="section-left">
+          <h2>Japanese</h2>
+          <span class="section-tag">Romaji</span>
+        </div>
+        <span class="section-glyph">語</span>
+      </div>
+      <p class="section-hint">Type standard romaji. Doubled consonants produce っ (e.g. <code style="font-family:'SF Mono','Menlo',monospace;font-size:11.5px;padding:2px 6px;">katta</code> → かった). Both Hepburn and Wāpuro styles are supported.</p>
+      <div class="examples">
+        <div class="example-row">
+          <div class="ex-input"><code>konnichiwa</code></div>
+          <div class="ex-output">こんにちは</div>
+          <div class="ex-meaning">Hello</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>arigatou</code></div>
+          <div class="ex-output">ありがとう</div>
+          <div class="ex-meaning">Thank you</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>sayonara</code></div>
+          <div class="ex-output">さようなら</div>
+          <div class="ex-meaning">Goodbye</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>watashi</code></div>
+          <div class="ex-output">私</div>
+          <div class="ex-meaning">I / me</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>taberu</code></div>
+          <div class="ex-output">食べる</div>
+          <div class="ex-meaning">To eat</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>kawaii</code></div>
+          <div class="ex-output">かわいい</div>
+          <div class="ex-meaning">Cute</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>nihongo</code></div>
+          <div class="ex-output">日本語</div>
+          <div class="ex-meaning">Japanese</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>benkyou</code></div>
+          <div class="ex-output">勉強</div>
+          <div class="ex-meaning">Study</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>sushi</code></div>
+          <div class="ex-output">すし</div>
+          <div class="ex-meaning">Sushi</div>
+        </div>
+        <div class="example-row">
+          <div class="ex-input"><code>katta</code></div>
+          <div class="ex-output">かった</div>
+          <div class="ex-meaning">Won / past tense</div>
+        </div>
+      </div>
+      <p class="field-label">Try it</p>
+      <textarea placeholder="Type romaji here…"></textarea>
+    </section>
+
+  </div>
 </body>
 </html>

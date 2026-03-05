@@ -1,17 +1,22 @@
 # LangSwitch
 
-LangSwitch is a Chrome extension that fixes mistyped keyboard-layout input directly in text fields.
+LangSwitch is a Chrome extension that fixes mistyped keyboard-layout input directly in text fields. It is built for multilingual typing and works fully locally — no internet required.
 
-It is built for multilingual typing and works fully locally in the browser.
+## Preview
+
+| Korean (Dubeolsik) | Chinese (Pinyin) | Japanese (Romaji) |
+|---|---|---|
+| ![Korean](1.png) | ![Chinese](2.png) | ![Japanese](3.png) |
 
 ## Features
 
-- Korean layout correction (English-key -> Hangul, Dubeolsik)
-- French accent restoration
-- Spanish accent restoration
+- Korean layout correction — English keys → Hangul (Dubeolsik)
+- Chinese input — Pinyin → Simplified Chinese characters
+- Japanese input — Romaji → Hiragana / Kanji
 - Suggestion tooltip + quick apply shortcut (`Alt + L`)
 - Optional auto-convert on `Space` / `Enter` / `Tab`
 - Context modes: `Strict`, `Balanced`, `Aggressive`
+- Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, etc.)
 - Per-site enable/disable rules
 - Theme and appearance settings (Light / Dark / Auto)
 
@@ -37,7 +42,10 @@ LangSwitch/
 │   ├── popup.css
 │   └── popup.js
 ├── data/
-│   └── english-words.txt
+│   ├── english-words.txt
+│   ├── korean-dict.tsv
+│   ├── chinese-dict.tsv
+│   └── japanese-dict.tsv
 └── dev/
     └── test.html
 ```
@@ -47,23 +55,23 @@ LangSwitch/
 1. Open Chrome and go to `chrome://extensions`
 2. Enable **Developer mode**
 3. Click **Load unpacked**
-4. Select this folder:
-   - `/Users/jamieryu/Desktop/workshop/Websites/LangSwitch`
+4. Select the `LangSwitch` folder
 
 ## Quick Test
 
-1. Open any page with an `input` or `textarea`
-2. Type `dkssudgktpdy`
-3. Confirm suggestion appears
-4. Press `Alt + L` to apply conversion
+1. Load `dev/test.html` in Chrome with the extension active
+2. Pick a language in the extension popup
+3. Type a phrase from the reference table (e.g. `dkssudgktpdy` for Korean, `nihao` for Chinese, `konnichiwa` for Japanese)
+4. Press `Space` to auto-convert, or `Alt + L` to apply the suggestion
 
 ## Settings
 
 Click the extension icon to configure:
 
-- Language: Korean / French / Spanish
+- Language: Korean / Chinese / Japanese
 - Context mode: Strict / Balanced / Aggressive
 - Auto-convert toggle
+- Korean slang mode toggle (Korean only)
 - Per-site enable/disable for current domain
 - Tooltip theme and appearance
 

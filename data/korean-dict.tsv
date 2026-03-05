@@ -1,0 +1,69 @@
+# key\tvalue\tscore
+# key: English keyboard sequence typed on Dubeolsik
+# value: Korean output
+# score: higher = preferred candidate
+
+dkssudgktpdy	안녕하세요	100
+sks	난	95
+wlrma	지금	95
+anjgkrh	뭐하고	95
+dlTek	있다	95
+
+zz	ㅋㅋ	100
+zzz	ㅋㅋㅋ	100
+zzzz	ㅋㅋㅋㅋ	100
+zzzzz	ㅋㅋㅋㅋㅋ	95
+z	ㅋ	80
+
+gg	ㅎㅎ	100
+ggg	ㅎㅎㅎ	100
+gggg	ㅎㅎㅎㅎ	100
+ggggg	ㅎㅎㅎㅎㅎ	95
+g	ㅎ	80
+
+qq	ㅃㅃ	70
+ww	ㅉㅉ	70
+tt	ㅆㅆ	70
+rr	ㄲㄲ	70
+
+dksl	아니	95
+rkatk	감사	85
+rkatkgkqslek	감사합니다	92
+
+dkfdk	알아	75
+rmf	글	70
+qkqh	바보	75
+qkqhdk	바보야	80
+th	소	60
+so	내	85
+dho	왜	75
+dml	의	70
+
+# Common words
+dkssud	안녕	95
+sk	나	90
+sj	너	90
+anj	뭐	85
+djel	어디	80
+gkrry	학교	85
+wlq	집	85
+tkfka	사람	85
+clsrn	친구	85
+qkq	밥	80
+tlrks	시간	80
+dlfma	이름	80
+
+# Time
+dhsmf	오늘	85
+sodlf	내일	85
+djwp	어제	85
+
+# Expressions (dict overrides jamo for correct composition)
+aldksgo	미안해	90
+rhakdnj	고마워	90
+whgk	좋아	85
+
+# Connectors
+rmflrh	그리고	75
+gkwlaks	하지만	75
+rmfotj	그래서	75

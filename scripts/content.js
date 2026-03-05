@@ -9,6 +9,7 @@
     tooltipTheme: "liquid-glass",
     appearance: "auto",
     autoConvert: true,
+    koreanSlangMode: true,
     siteRules: {}
   };
 
@@ -24,6 +25,35 @@
   ]);
 
   const ENGLISH_WORD_SET = new Set(COMMON_ENGLISH_WORDS);
+  const CHINESE_AMBIGUOUS_SYLLABLES = new Set([
+    "a", "ai", "an", "ang", "ba", "da", "de", "di", "do", "he", "in", "is", "it",
+    "la", "li", "ma", "me", "na", "ne", "no", "on", "ou", "qi", "so", "ta", "to",
+    "we", "wo", "ya", "yo", "you"
+  ]);
+  const JAPANESE_AMBIGUOUS_ROMAJI = new Set([
+    "a", "an", "as", "at", "do", "go", "ha", "he", "hi", "i", "in", "is", "it",
+    "ka", "me", "mi", "na", "ne", "no", "on", "to", "we", "yo", "so"
+  ]);
+  const KOREAN_SLANG_BY_KEY = new Map([
+    ["dd", "ㅇㅇ"],
+    ["ddd", "ㅇㅇㅇ"],
+    ["dddd", "ㅇㅇㅇㅇ"],
+    ["dz", "ㅇㅋ"],
+    ["dzdz", "ㅇㅋㅇㅋ"],
+    ["rr", "ㄱㄱ"],
+    ["rrr", "ㄱㄱㄱ"],
+    ["ss", "ㄴㄴ"],
+    ["sss", "ㄴㄴㄴ"],
+    ["qq", "ㅂㅂ"],
+    ["qqq", "ㅂㅂㅂ"],
+    ["rt", "ㄱㅅ"],
+    ["wt", "ㅈㅅ"],
+    ["af", "ㅁㄹ"],
+    ["gd", "ㅎㅇ"],
+    ["cv", "ㅊㅋ"],
+    ["eo", "ㄷㅇ"],
+    ["df", "ㅇㄹ"]
+  ]);
   let settings = { ...DEFAULT_SETTINGS };
 
   async function loadSettings() {
@@ -106,6 +136,26 @@
     return null;
   }
 
+  function getSelectionEditableTarget() {
+    const active = document.activeElement;
+    if (isPlainInput(active)) return active;
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+
+    const node = sel.anchorNode;
+    if (!node) return null;
+
+    const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    if (!(el instanceof Element)) return null;
+
+    return getEditableTarget(el);
+  }
+
+  function resolveEditableTargetFromEventTarget(target) {
+    return getEditableTarget(target) || getSelectionEditableTarget() || getEditableTarget(document.activeElement);
+  }
+
   function isSupportedInput(target) {
     return Boolean(getEditableTarget(target));
   }
@@ -120,6 +170,10 @@
 
   function looksLikeAlphaWord(word) {
     return /^[a-z]{2,}$/i.test(word);
+  }
+
+  function normalizeLatinWord(word) {
+    return word.toLowerCase().replace(/[^a-z]/g, "");
   }
 
   function isLikelyEnglishWord(word) {
@@ -443,14 +497,39 @@
     return /[\uac00-\ud7a3]/i.test(text.slice(left, right));
   }
 
-  function getConvertedWord(word) {
-    if (!window.convertWithLanguage) {
-      return window.convertToKorean ? window.convertToKorean(word) : word;
-    }
-    return window.convertWithLanguage(word, settings.language);
+  function hasScriptAround(el, start, end, pattern) {
+    const left = Math.max(0, start - 24);
+    const text = getEditableText(el);
+    const right = Math.min(text.length, end + 24);
+    return pattern.test(text.slice(left, right));
   }
 
-  function isGoodKoreanCandidate(el, wordInfo, converted) {
+  function getConvertedWord(word) {
+    const slang = getKoreanSlangConversion(word);
+    if (slang) return slang;
+
+    if (!window.convertWithLanguage) {
+      const text = window.convertToKorean ? window.convertToKorean(word) : word;
+      return { text, approvedSlang: false };
+    }
+    return {
+      text: window.convertWithLanguage(word, settings.language),
+      approvedSlang: false
+    };
+  }
+
+  function getKoreanSlangConversion(word) {
+    if (settings.language !== "korean" || !settings.koreanSlangMode) return null;
+    if (!/^[A-Za-z]{2,8}$/.test(word)) return null;
+
+    const normalized = normalizeLatinWord(word);
+    const slang = KOREAN_SLANG_BY_KEY.get(normalized);
+    if (!slang) return null;
+
+    return { text: slang, approvedSlang: true };
+  }
+
+  function isGoodKoreanCandidate(el, wordInfo, converted, options = {}) {
     const mode = settings.contextMode || "balanced";
     const plainWord = wordInfo.word.replace(/[^A-Za-z]/g, "");
     if (converted === wordInfo.word) return false;
@@ -462,6 +541,20 @@
     const hasContextHangul = hasHangulAround(el, wordInfo.start, wordInfo.end);
     const isShortWord = plainWord.length <= 2;
     const englishLike = isLikelyEnglishWord(plainWord);
+    const isChatJamo = /^[\u3131-\u318e]{2,}$/.test(converted);
+    const allowedChatChars = new Set(["ㅋ", "ㅎ", "ㅠ", "ㅜ", "ㄷ"]);
+
+    // Allow informal Korean chat patterns only for repeated allowed chars:
+    // ㅋㅋㅋㅋ, ㅎㅎㅎ, ㅠㅠ, ㅜㅜ, ㄷㄷ.
+    if (isChatJamo) {
+      if (options.approvedSlang) return true;
+      const chars = Array.from(converted);
+      if (chars.length < 2) return false;
+      if (chars.every((ch) => ch === chars[0] && allowedChatChars.has(ch))) {
+        return true;
+      }
+      return false;
+    }
 
     if (mode === "strict") {
       if (englishLike) return false;
@@ -515,15 +608,81 @@
     return hasAccentMarker;
   }
 
-  function isGoodCandidate(el, wordInfo, converted) {
+  function isChineseCandidate(el, wordInfo, input, converted) {
+    const mode = settings.contextMode || "balanced";
+    const normalized = normalizeLatinWord(input);
+    if (converted === input) return false;
+
+    const hasCjk = /[\u4e00-\u9fff]/.test(converted);
+    if (!hasCjk) return false;
+    if (!/^[a-z]+$/i.test(input)) return false;
+
+    const hasChineseContext = hasScriptAround(el, wordInfo.start, wordInfo.end, /[\u4e00-\u9fff]/);
+    const englishLike = isLikelyEnglishWord(normalized);
+    const ambiguous = CHINESE_AMBIGUOUS_SYLLABLES.has(normalized);
+
+    if (mode === "strict") {
+      if (normalized.length < 4) return false;
+      if (englishLike) return false;
+      if (ambiguous && !hasChineseContext) return false;
+      return true;
+    }
+    if (mode === "aggressive") {
+      if (normalized.length < 2) return false;
+      if (ambiguous && !hasChineseContext) return false;
+      return true;
+    }
+    if (normalized.length < 3) return false;
+    if (englishLike && !hasChineseContext) return false;
+    if (ambiguous && !hasChineseContext) return false;
+    return true;
+  }
+
+  function isJapaneseCandidate(el, wordInfo, input, converted) {
+    const mode = settings.contextMode || "balanced";
+    const normalized = normalizeLatinWord(input);
+    if (converted === input) return false;
+
+    const hasJp = /[\u3040-\u30ff\u4e00-\u9fff]/.test(converted);
+    if (!hasJp) return false;
+    if (!/^[a-z]+$/i.test(input)) return false;
+    if (/[bcdfghjklmpqrstvwxyz]$/.test(normalized) && !normalized.endsWith("n")) return false;
+
+    const hasJapaneseContext = hasScriptAround(el, wordInfo.start, wordInfo.end, /[\u3040-\u30ff\u4e00-\u9fff]/);
+    const englishLike = isLikelyEnglishWord(normalized);
+    const ambiguous = JAPANESE_AMBIGUOUS_ROMAJI.has(normalized);
+
+    if (mode === "strict") {
+      if (normalized.length < 4) return false;
+      if (englishLike) return false;
+      if (ambiguous && !hasJapaneseContext) return false;
+      return true;
+    }
+    if (mode === "aggressive") {
+      if (normalized.length < 2) return false;
+      if (ambiguous && !hasJapaneseContext) return false;
+      return true;
+    }
+    if (normalized.length < 3) return false;
+    if (englishLike && !hasJapaneseContext) return false;
+    if (ambiguous && !hasJapaneseContext) return false;
+    return true;
+  }
+
+  function isGoodCandidate(el, wordInfo, candidate) {
+    const converted = candidate.text;
     switch (settings.language) {
+      case "japanese":
+        return isJapaneseCandidate(el, wordInfo, wordInfo.word, converted);
+      case "chinese":
+        return isChineseCandidate(el, wordInfo, wordInfo.word, converted);
       case "spanish":
         return isSpanishCandidate(wordInfo.word, converted);
       case "french":
         return isFrenchCandidate(wordInfo.word, converted);
       case "korean":
       default:
-        return isGoodKoreanCandidate(el, wordInfo, converted);
+        return isGoodKoreanCandidate(el, wordInfo, converted, candidate);
     }
   }
 
@@ -577,25 +736,40 @@
     const startPos = resolveTextPosition(el, boundedStart);
     const endPos = resolveTextPosition(el, boundedEnd);
 
-    const range = document.createRange();
-    range.setStart(startPos.node, startPos.offset);
-    range.setEnd(endPos.node, endPos.offset);
-    range.deleteContents();
+    try {
+      const range = document.createRange();
+      range.setStart(startPos.node, startPos.offset);
+      range.setEnd(endPos.node, endPos.offset);
+      range.deleteContents();
 
-    const inserted = document.createTextNode(replacement);
-    range.insertNode(inserted);
+      const inserted = document.createTextNode(replacement);
+      range.insertNode(inserted);
 
-    const caret = document.createRange();
-    caret.setStart(inserted, inserted.textContent ? inserted.textContent.length : 0);
-    caret.collapse(true);
+      const caret = document.createRange();
+      caret.setStart(inserted, inserted.textContent ? inserted.textContent.length : 0);
+      caret.collapse(true);
 
-    const sel = window.getSelection();
-    if (sel) {
-      sel.removeAllRanges();
-      sel.addRange(caret);
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(caret);
+      }
+    } catch (error) {
+      // Fallback for editors with strict DOM handling.
+      if (document.queryCommandSupported && document.queryCommandSupported("insertText")) {
+        document.execCommand("insertText", false, replacement);
+      }
     }
 
     el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function isCjkCommitLanguage() {
+    return settings.language === "chinese" || settings.language === "japanese";
+  }
+
+  function isBoundaryCommitKey(e) {
+    return e.key === " " || e.key === "Enter" || e.key === "Tab" || e.key === "NumpadEnter";
   }
 
   function maybeShowSuggestion(el) {
@@ -610,23 +784,23 @@
       return;
     }
 
-    const converted = getConvertedWord(wordInfo.word);
-    if (!isGoodCandidate(el, wordInfo, converted)) {
+    const candidate = getConvertedWord(wordInfo.word);
+    if (!isGoodCandidate(el, wordInfo, candidate)) {
       removeSuggestion();
       return;
     }
 
-    showSuggestion(el, converted);
+    showSuggestion(el, candidate.text);
   }
 
   document.addEventListener("input", (e) => {
-    const el = getEditableTarget(e.target) || getEditableTarget(document.activeElement);
+    const el = resolveEditableTargetFromEventTarget(e.target);
     if (!isSupportedInput(el)) return;
     maybeShowSuggestion(el);
   }, true);
 
   document.addEventListener("keydown", (e) => {
-    const el = getEditableTarget(e.target) || getEditableTarget(document.activeElement);
+    const el = resolveEditableTargetFromEventTarget(e.target);
     if (!isSupportedInput(el)) return;
     if (e.isComposing) return;
     if (!isEnabledOnCurrentSite()) {
@@ -645,16 +819,20 @@
 
     if (!settings.autoConvert) return;
 
-    const isBoundaryKey = e.key === " " || e.key === "Enter" || e.key === "Tab";
+    const isBoundaryKey = isBoundaryCommitKey(e);
     if (!isBoundaryKey || e.ctrlKey || e.metaKey || e.altKey) return;
 
     const wordInfo = getWordBeforeCaret(el);
     if (!wordInfo) return;
 
-    const converted = getConvertedWord(wordInfo.word);
-    if (!isGoodCandidate(el, wordInfo, converted)) return;
+    const candidate = getConvertedWord(wordInfo.word);
+    if (!isGoodCandidate(el, wordInfo, candidate)) return;
 
-    replaceRange(el, wordInfo.start, wordInfo.end, converted);
+    if (isCjkCommitLanguage() && (e.key === "Enter" || e.key === "NumpadEnter")) {
+      e.preventDefault();
+    }
+
+    replaceRange(el, wordInfo.start, wordInfo.end, candidate.text);
     removeSuggestion();
   }, true);
 

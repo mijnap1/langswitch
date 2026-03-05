@@ -24,12 +24,19 @@
     {
       "matches": ["<all_urls>"],
       "js": ["scripts/converter.js", "scripts/content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["data/english-words.txt"],
+      "resources": [
+        "data/english-words.txt",
+        "data/korean-dict.tsv",
+        "data/chinese-dict.tsv",
+        "data/japanese-dict.tsv"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
