@@ -2,13 +2,11 @@
 
 A Chrome extension that converts mistyped keyboard-layout input directly in text fields. Built for multilingual typing — works fully locally, no internet required.
 
----
 
 ## How It Works
 
 Type naturally with your keyboard. LangSwitch detects when your input looks like a mistyped layout and shows a suggestion tooltip. Press `Alt + L` to apply it instantly, or enable auto-convert to have it apply on `Space` / `Enter` / `Tab`.
 
----
 
 ## Languages
 
@@ -18,7 +16,6 @@ Type English keys as if your layout were Dubeolsik. LangSwitch composes the corr
 
 ![Korean](assets/screenshots/1.png)
 
----
 
 ### 🇨🇳 Chinese — Pinyin
 
@@ -26,7 +23,6 @@ Type pinyin without spaces or tone marks. Use `v` in place of `ü` (e.g. `nv` �
 
 ![Chinese](assets/screenshots/2.png)
 
----
 
 ### 🇯🇵 Japanese — Romaji
 
@@ -34,7 +30,6 @@ Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta`
 
 ![Japanese](assets/screenshots/3.png)
 
----
 
 ## Features
 
@@ -49,7 +44,6 @@ Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta`
 
 All processing is local. No keystrokes, no content, and no data of any kind is sent to external servers.
 
----
 
 ## Setup
 
@@ -63,7 +57,6 @@ All processing is local. No keystrokes, no content, and no data of any kind is s
 2. Select a language in the popup
 3. Type a phrase from the reference table and press `Space`
 
----
 
 ## Project Structure
 
@@ -90,7 +83,6 @@ LangSwitch/
     └── test.html
 ```
 
----
 
 ## Permissions
 
@@ -100,7 +92,6 @@ LangSwitch/
 | `tabs` + `activeTab` | Read current domain for per-site toggle |
 | Host access | Detect and convert input on any page |
 
----
 
 ## License
 
