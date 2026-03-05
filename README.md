@@ -1,39 +1,79 @@
 # LangSwitch
 
-LangSwitch is a Chrome extension that fixes mistyped keyboard-layout input directly in text fields. It is built for multilingual typing and works fully locally — no internet required.
+A Chrome extension that converts mistyped keyboard-layout input directly in text fields. Built for multilingual typing — works fully locally, no internet required.
 
-## Preview
+---
 
-| Korean (Dubeolsik) | Chinese (Pinyin) | Japanese (Romaji) |
-|---|---|---|
-| ![Korean](assets/screenshots/1.png) | ![Chinese](assets/screenshots/2.png) | ![Japanese](assets/screenshots/3.png) |
+## How It Works
+
+Type naturally with your keyboard. LangSwitch detects when your input looks like a mistyped layout and shows a suggestion tooltip. Press `Alt + L` to apply it instantly, or enable auto-convert to have it apply on `Space` / `Enter` / `Tab`.
+
+---
+
+## Languages
+
+### 🇰🇷 Korean — Dubeolsik
+
+Type English keys as if your layout were Dubeolsik. LangSwitch composes the correct Hangul syllables and recognises common Korean slang (ㅋㅋ, ㅇㅋ, ㄱㅅ, etc.).
+
+![Korean](assets/screenshots/1.png)
+
+---
+
+### 🇨🇳 Chinese — Pinyin
+
+Type pinyin without spaces or tone marks. Use `v` in place of `ü` (e.g. `nv` → 女, `lv` → 旅) — just like standard Windows IME input.
+
+![Chinese](assets/screenshots/2.png)
+
+---
+
+### 🇯🇵 Japanese — Romaji
+
+Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta` → かった). Both Hepburn and Wāpuro styles are supported.
+
+![Japanese](assets/screenshots/3.png)
+
+---
 
 ## Features
 
-- Korean layout correction — English keys → Hangul (Dubeolsik)
-- Chinese input — Pinyin → Simplified Chinese characters
-- Japanese input — Romaji → Hiragana / Kanji
-- Suggestion tooltip + quick apply shortcut (`Alt + L`)
-- Optional auto-convert on `Space` / `Enter` / `Tab`
-- Context modes: `Strict`, `Balanced`, `Aggressive`
-- Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, etc.)
-- Per-site enable/disable rules
-- Theme and appearance settings (Light / Dark / Auto)
+- Suggestion tooltip with `Alt + L` quick-apply
+- Auto-convert on `Space` / `Enter` / `Tab`
+- Context modes — `Strict`, `Balanced`, `Aggressive`
+- Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, ㄱㄱ, ...)
+- Per-site enable / disable rules
+- 10 tooltip themes — Light / Dark / Auto
 
 ## Privacy
 
-- 100% local processing
-- No cloud translation
-- No remote AI calls
-- No typing content sent to external servers
+All processing is local. No keystrokes, no content, and no data of any kind is sent to external servers.
+
+---
+
+## Setup
+
+1. Go to `chrome://extensions` in Chrome
+2. Enable **Developer mode**
+3. Click **Load unpacked** and select the `LangSwitch` folder
+
+## Quick Test
+
+1. Load `dev/test.html` with the extension active
+2. Select a language in the popup
+3. Type a phrase from the reference table and press `Space`
+
+---
 
 ## Project Structure
 
-```text
+```
 LangSwitch/
 ├── manifest.json
 ├── assets/
-│   └── logo.png
+│   ├── logo.png
+│   ├── LangSwitch Logo.png
+│   └── screenshots/
 ├── scripts/
 │   ├── converter.js
 │   └── content.js
@@ -50,43 +90,18 @@ LangSwitch/
     └── test.html
 ```
 
-## Local Setup
+---
 
-1. Open Chrome and go to `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked**
-4. Select the `LangSwitch` folder
+## Permissions
 
-## Quick Test
+| Permission | Reason |
+|---|---|
+| `storage` | Save user settings |
+| `tabs` + `activeTab` | Read current domain for per-site toggle |
+| Host access | Detect and convert input on any page |
 
-1. Load `dev/test.html` in Chrome with the extension active
-2. Pick a language in the extension popup
-3. Type a phrase from the reference table (e.g. `dkssudgktpdy` for Korean, `nihao` for Chinese, `konnichiwa` for Japanese)
-4. Press `Space` to auto-convert, or `Alt + L` to apply the suggestion
-
-## Settings
-
-Click the extension icon to configure:
-
-- Language: Korean / Chinese / Japanese
-- Context mode: Strict / Balanced / Aggressive
-- Auto-convert toggle
-- Korean slang mode toggle (Korean only)
-- Per-site enable/disable for current domain
-- Tooltip theme and appearance
-
-## Permissions (Why)
-
-- `storage`: save user settings
-- `tabs` + `activeTab`: get current domain for per-site toggle in popup
-- Host access via content scripts: detect/convert in editable fields on pages
-
-## Publishing Notes
-
-- Category: **Tools**
-- Keep a public privacy policy URL in the store listing
-- If using `<all_urls>`, Chrome Web Store review can take longer due to broad host permissions
+---
 
 ## License
 
-Add a license file (`LICENSE`) before release (MIT is a common choice).
+Add a `LICENSE` file before release — MIT is recommended.
