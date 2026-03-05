@@ -1,6 +1,6 @@
 # LangSwitch
 
-A Chrome extension that converts mistyped keyboard-layout input directly in text fields. Built for multilingual typing — works fully locally, no internet required.
+A Chrome extension that converts mistyped keyboard-layout input directly in text fields. Built for multilingual typing works fully locally, no internet required.
 
 
 ## How It Works
@@ -10,21 +10,21 @@ Type naturally with your keyboard. LangSwitch detects when your input looks like
 
 ## Languages
 
-### 🇰🇷 Korean — Dubeolsik
+### 🇰🇷 Korean Dubeolsik
 
 Type English keys as if your layout were Dubeolsik. LangSwitch composes the correct Hangul syllables and recognises common Korean slang (ㅋㅋ, ㅇㅋ, ㄱㅅ, etc.).
 
 ![Korean](assets/screenshots/1.png)
 
 
-### 🇨🇳 Chinese — Pinyin
+### 🇨🇳 Chinese Pinyin
 
-Type pinyin without spaces or tone marks. Use `v` in place of `ü` (e.g. `nv` → 女, `lv` → 旅) — just like standard Windows IME input.
+Type pinyin without spaces or tone marks. Use `v` in place of `ü` (e.g. `nv` → 女, `lv` → 旅) just like standard Windows IME input.
 
 ![Chinese](assets/screenshots/2.png)
 
 
-### 🇯🇵 Japanese — Romaji
+### 🇯🇵 Japanese Romaji
 
 Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta` → かった). Both Hepburn and Wāpuro styles are supported.
 
@@ -35,10 +35,10 @@ Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta`
 
 - Suggestion tooltip with `Alt + L` quick-apply
 - Auto-convert on `Space` / `Enter` / `Tab`
-- Context modes — `Strict`, `Balanced`, `Aggressive`
+- Context modes `Strict`, `Balanced`, `Aggressive`
 - Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, ㄱㄱ, ...)
 - Per-site enable / disable rules
-- 10 tooltip themes — Light / Dark / Auto
+- 10 tooltip themes Light / Dark / Auto
 
 ## Privacy
 
@@ -95,4 +95,4 @@ LangSwitch/
 
 ## License
 
-Add a `LICENSE` file before release — MIT is recommended.
+Add a `LICENSE` file before release MIT is recommended.
