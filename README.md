@@ -93,6 +93,4 @@ LangSwitch/
 | Host access | Detect and convert input on any page |
 
 
-## License
-
 Add a `LICENSE` file before release MIT is recommended.
