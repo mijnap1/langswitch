@@ -6,7 +6,7 @@ LangSwitch is a Chrome extension that fixes mistyped keyboard-layout input direc
 
 | Korean (Dubeolsik) | Chinese (Pinyin) | Japanese (Romaji) |
 |---|---|---|
-| ![Korean](1.png) | ![Chinese](2.png) | ![Japanese](3.png) |
+| ![Korean](assets/screenshots/1.png) | ![Chinese](assets/screenshots/2.png) | ![Japanese](assets/screenshots/3.png) |
 
 ## Features
 
