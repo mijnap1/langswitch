@@ -1,12 +1,25 @@
 <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none">
-  <rect width="32" height="32" rx="8" fill="#f0f0f0"/>
-  <text
-    x="16" y="22"
-    text-anchor="middle"
-    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif"
-    font-weight="600"
-    font-size="14"
-    fill="#444"
-    letter-spacing="-0.5"
-  >LS</text>
+  <rect width="32" height="32" rx="7" fill="#eeeeee"/>
+
+  <clipPath id="clip">
+    <rect width="32" height="32" rx="7"/>
+  </clipPath>
+
+  <g clip-path="url(#clip)">
+    <!-- Oversized background texture — barely visible, creates depth -->
+    <text x="2" y="35"
+      font-family="Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+      font-size="40" fill="#444" opacity="0.08">가</text>
+
+    <!-- Ghost state — slightly larger, rotated, fading — suggests mid-change -->
+    <text x="16" y="22" text-anchor="middle"
+      font-family="Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+      font-size="20" fill="#555" opacity="0.20"
+      transform="rotate(6, 16, 16)">가</text>
+
+    <!-- Primary character — clean, sharp, settled -->
+    <text x="16" y="22" text-anchor="middle"
+      font-family="Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+      font-weight="600" font-size="16" fill="#252525">가</text>
+  </g>
 </svg>
