@@ -1,5 +1,6 @@
 (() => {
   let lastSuggestion = null;
+  let isAutoConverting = false;
   const TOOLTIP_CLASS = "layout-fix-tooltip";
   const ENGLISH_WORDS_RESOURCE = "data/english-words.txt";
 
@@ -843,9 +844,55 @@
     showSuggestion(el, candidate.text);
   }
 
+  // Instagram auto-convert: runs after the space is naturally typed (React stays in sync).
+  function tryInstagramAutoConvert(el) {
+    const caret = getCaretOffset(el);
+    if (caret === null || caret < 2) return;
+
+    const text = getEditableText(el);
+    const beforeCaret = text.slice(0, caret);
+    const lastChar = beforeCaret[beforeCaret.length - 1];
+    if (lastChar !== " " && lastChar !== "\u00A0") return;
+
+    const beforeSpace = beforeCaret.slice(0, -1);
+    const match = beforeSpace.match(/[A-Za-z';~]{2,}$/);
+    if (!match) return;
+
+    const word = match[0];
+    const wordStart = caret - word.length - 1;
+    const wordEnd = caret - 1;
+    const wordInfo = { word, start: wordStart, end: wordEnd };
+
+    const candidate = getConvertedWord(word);
+    if (!isGoodCandidate(el, wordInfo, candidate)) return;
+
+    const startPos = resolveTextPosition(el, wordStart);
+    const endPos = resolveTextPosition(el, wordEnd);
+
+    try {
+      const range = document.createRange();
+      range.setStart(startPos.node, startPos.offset);
+      range.setEnd(endPos.node, endPos.offset);
+
+      const sel = window.getSelection();
+      if (!sel) return;
+
+      isAutoConverting = true;
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand("insertText", false, candidate.text);
+      removeSuggestion();
+    } finally {
+      isAutoConverting = false;
+    }
+  }
+
   document.addEventListener("input", (e) => {
     const el = resolveEditableTargetFromEventTarget(e.target);
     if (!isSupportedInput(el)) return;
+    if (settings.autoConvert && isInstagramHost() && !isPlainInput(el) && !isAutoConverting) {
+      tryInstagramAutoConvert(el);
+    }
     maybeShowSuggestion(el);
   }, true);
 
@@ -868,22 +915,6 @@
     }
 
     if (!settings.autoConvert) return;
-
-    // Instagram composer compatibility: use selection-based insertText on Space
-    // so previous text is preserved while auto-convert remains available.
-    if (isInstagramHost() && !isPlainInput(el) && e.key === " " && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const wordInfo = getWordBeforeCaret(el);
-      if (!wordInfo) return;
-
-      const candidate = getConvertedWord(wordInfo.word);
-      if (!isGoodCandidate(el, wordInfo, candidate)) return;
-
-      e.preventDefault();
-      if (replaceWordBeforeCaretBySelection(el, `${candidate.text} `)) {
-        removeSuggestion();
-      }
-      return;
-    }
 
     if (isInstagramHost() && !isPlainInput(el)) return;
 
