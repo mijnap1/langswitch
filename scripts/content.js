@@ -860,8 +860,9 @@
 
     const word = match[0];
     const wordStart = caret - word.length - 1;
-    const wordEnd = caret - 1;
-    const wordInfo = { word, start: wordStart, end: wordEnd };
+    // Include the space in the replaced range so cursor lands after "converted "
+    const wordEnd = caret;
+    const wordInfo = { word, start: wordStart, end: caret - 1 };
 
     const candidate = getConvertedWord(word);
     if (!isGoodCandidate(el, wordInfo, candidate)) return;
@@ -880,7 +881,8 @@
       isAutoConverting = true;
       sel.removeAllRanges();
       sel.addRange(range);
-      document.execCommand("insertText", false, candidate.text);
+      // Replace "word " (with space) → "converted " so the space is always present
+      document.execCommand("insertText", false, candidate.text + " ");
       removeSuggestion();
     } finally {
       isAutoConverting = false;
