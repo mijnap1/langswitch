@@ -168,6 +168,11 @@
     return rules[host] !== false;
   }
 
+  function isInstagramHost() {
+    const host = window.location.hostname || "";
+    return host === "instagram.com" || host.endsWith(".instagram.com");
+  }
+
   function looksLikeAlphaWord(word) {
     return /^[a-z]{2,}$/i.test(word);
   }
@@ -818,6 +823,10 @@
     }
 
     if (!settings.autoConvert) return;
+
+    // Instagram's rich composer can lose prior text on programmatic replacement.
+    // Keep typing stable there by disabling boundary auto-convert in contenteditable.
+    if (isInstagramHost() && !isPlainInput(el)) return;
 
     const isBoundaryKey = isBoundaryCommitKey(e);
     if (!isBoundaryKey || e.ctrlKey || e.metaKey || e.altKey) return;
