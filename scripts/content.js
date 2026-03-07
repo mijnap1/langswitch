@@ -769,6 +769,51 @@
     el.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
+  function replaceWordBeforeCaretBySelection(el, replacementWithBoundary) {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return false;
+
+    const caret = sel.getRangeAt(0);
+    if (!caret.collapsed) return false;
+    if (!el.contains(caret.endContainer)) return false;
+
+    const preCaret = caret.cloneRange();
+    preCaret.selectNodeContents(el);
+    preCaret.setEnd(caret.endContainer, caret.endOffset);
+    const textBeforeCaret = preCaret.toString();
+    const match = textBeforeCaret.match(/[A-Za-z';~]{2,}$/);
+    if (!match) return false;
+
+    const start = textBeforeCaret.length - match[0].length;
+    const end = textBeforeCaret.length;
+    const startPos = resolveTextPosition(el, start);
+    const endPos = resolveTextPosition(el, end);
+
+    const range = document.createRange();
+    range.setStart(startPos.node, startPos.offset);
+    range.setEnd(endPos.node, endPos.offset);
+
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    if (document.queryCommandSupported && document.queryCommandSupported("insertText")) {
+      document.execCommand("insertText", false, replacementWithBoundary);
+      return true;
+    }
+
+    range.deleteContents();
+    const inserted = document.createTextNode(replacementWithBoundary);
+    range.insertNode(inserted);
+
+    const caretAfter = document.createRange();
+    caretAfter.setStart(inserted, inserted.textContent ? inserted.textContent.length : 0);
+    caretAfter.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(caretAfter);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    return true;
+  }
+
   function isCjkCommitLanguage() {
     return settings.language === "chinese" || settings.language === "japanese";
   }
@@ -824,8 +869,22 @@
 
     if (!settings.autoConvert) return;
 
-    // Instagram's rich composer can lose prior text on programmatic replacement.
-    // Keep typing stable there by disabling boundary auto-convert in contenteditable.
+    // Instagram composer compatibility: use selection-based insertText on Space
+    // so previous text is preserved while auto-convert remains available.
+    if (isInstagramHost() && !isPlainInput(el) && e.key === " " && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const wordInfo = getWordBeforeCaret(el);
+      if (!wordInfo) return;
+
+      const candidate = getConvertedWord(wordInfo.word);
+      if (!isGoodCandidate(el, wordInfo, candidate)) return;
+
+      e.preventDefault();
+      if (replaceWordBeforeCaretBySelection(el, `${candidate.text} `)) {
+        removeSuggestion();
+      }
+      return;
+    }
+
     if (isInstagramHost() && !isPlainInput(el)) return;
 
     const isBoundaryKey = isBoundaryCommitKey(e);
