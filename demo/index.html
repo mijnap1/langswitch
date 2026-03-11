@@ -167,15 +167,19 @@
 
     .ex-input code {
       font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
-      font-size: 12px;
-      background: var(--gray-5);
-      padding: 3px 8px;
-      border-radius: 5px;
-      letter-spacing: 0.2px;
+      font-size: 11.5px;
+      font-weight: 400;
+      color: var(--gray-2);
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      letter-spacing: 0.14em;
     }
 
     .ex-output {
-      color: var(--black);
+      color: var(--gray-1);
+      font-weight: 400;
+      line-height: 1.2;
     }
 
     .ex-meaning {
@@ -219,25 +223,53 @@
     textarea::placeholder { color: var(--gray-3); }
 
     /* ══════════════════════════════════════════════════════
-       KOREAN  bold, blocky, punchy
+       KOREAN  airy, editorial, aligned with Japanese
        ══════════════════════════════════════════════════════ */
     .section-ko .section-header {
       border-bottom: 1px solid var(--black);
       padding-bottom: 16px;
     }
 
-    .section-ko .section-header h2 {
+    .section-ko .section-header h2,
+    .section-zh .section-header h2,
+    .section-ja .section-header h2 {
       font-weight: 500;
       letter-spacing: 0.5px;
     }
 
-    .section-ko .section-tag {
+    .section-ko .section-tag,
+    .section-zh .section-tag,
+    .section-ja .section-tag {
       letter-spacing: 1.5px;
     }
 
+    .section-ko .example-row,
+    .section-zh .example-row,
+    .section-ja .example-row {
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section-ko .ex-input code,
+    .section-zh .ex-input code,
+    .section-ja .ex-input code {
+      background: none;
+      padding: 0;
+      color: var(--gray-2);
+      font-size: 11.5px;
+    }
+
     .section-ko .ex-output {
-      font-size: 18px;
-      font-weight: 400;
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      color: var(--gray-1);
+    }
+
+    .section-ko .ex-meaning,
+    .section-zh .ex-meaning,
+    .section-ja .ex-meaning {
+      color: var(--gray-3);
     }
 
     .section-ko textarea {
@@ -246,30 +278,19 @@
     }
 
     /* ══════════════════════════════════════════════════════
-       CHINESE  structured, classical, spacious
+       CHINESE  airy, editorial, aligned with Japanese
        ══════════════════════════════════════════════════════ */
     .section-zh .section-header {
       border-bottom: 1px solid var(--black);
       padding-bottom: 16px;
     }
 
-    .section-zh .section-header h2 {
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    .section-zh .section-tag {
-      letter-spacing: 1.5px;
-    }
-
-    .section-zh .example-row {
-      padding: 13px 0;
-    }
-
     .section-zh .ex-output {
-      font-size: 19px;
+      font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      font-size: 16px;
       font-weight: 400;
-      letter-spacing: 2px;
+      letter-spacing: 0.08em;
+      color: var(--gray-1);
     }
 
     .section-zh textarea {
@@ -285,36 +306,12 @@
       padding-bottom: 16px;
     }
 
-    .section-ja .section-header h2 {
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    .section-ja .section-tag {
-      letter-spacing: 1.5px;
-    }
-
-    .section-ja .example-row {
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
     .section-ja .ex-output {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
       font-size: 16px;
       font-weight: 400;
-      letter-spacing: 1.5px;
+      letter-spacing: 0.08em;
       color: var(--gray-1);
-    }
-
-    .section-ja .ex-input code {
-      background: none;
-      padding: 0;
-      color: var(--gray-2);
-      font-size: 11.5px;
-    }
-
-    .section-ja .ex-meaning {
-      color: var(--gray-3);
     }
 
     .section-ja textarea {

@@ -846,43 +846,45 @@
 
   // Instagram auto-convert: runs after the space is naturally typed (React stays in sync).
   function tryInstagramAutoConvert(el) {
-    const caret = getCaretOffset(el);
-    if (caret === null || caret < 2) return;
-
     const text = getEditableText(el);
-    const beforeCaret = text.slice(0, caret);
-    const lastChar = beforeCaret[beforeCaret.length - 1];
+    if (!text) return;
+    // Always check from end of text — Instagram users type at the end,
+    // and getCaretOffset is unreliable on the first input in a fresh field.
+    const lastChar = text[text.length - 1];
     if (lastChar !== " " && lastChar !== "\u00A0") return;
 
-    const beforeSpace = beforeCaret.slice(0, -1);
+    const beforeSpace = text.slice(0, -1);
     const match = beforeSpace.match(/[A-Za-z';~]{2,}$/);
     if (!match) return;
 
     const word = match[0];
-    const wordStart = caret - word.length - 1;
-    // Include the space in the replaced range so cursor lands after "converted "
-    const wordEnd = caret;
-    const wordInfo = { word, start: wordStart, end: caret - 1 };
+    const wordStart = text.length - word.length - 1;
+    const wordEnd = text.length;  // includes the trailing space
+    const wordInfo = { word, start: wordStart, end: text.length - 1 };
 
     const candidate = getConvertedWord(word);
     if (!isGoodCandidate(el, wordInfo, candidate)) return;
 
-    const startPos = resolveTextPosition(el, wordStart);
-    const endPos = resolveTextPosition(el, wordEnd);
-
+    el.focus();
+    isAutoConverting = true;
     try {
-      const range = document.createRange();
-      range.setStart(startPos.node, startPos.offset);
-      range.setEnd(endPos.node, endPos.offset);
-
-      const sel = window.getSelection();
-      if (!sel) return;
-
-      isAutoConverting = true;
-      sel.removeAllRanges();
-      sel.addRange(range);
-      // Replace "word " (with space) → "converted " so the space is always present
-      document.execCommand("insertText", false, candidate.text + " ");
+      if (wordStart === 0) {
+        // Replacing the entire content — use selectAll so Lexical's editor
+        // processes it through its standard "replace all" code path.
+        document.execCommand("selectAll");
+        document.execCommand("insertText", false, candidate.text + " ");
+      } else {
+        const startPos = resolveTextPosition(el, wordStart);
+        const endPos = resolveTextPosition(el, wordEnd);
+        const range = document.createRange();
+        range.setStart(startPos.node, startPos.offset);
+        range.setEnd(endPos.node, endPos.offset);
+        const sel = window.getSelection();
+        if (!sel) return;
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand("insertText", false, candidate.text + " ");
+      }
       removeSuggestion();
     } finally {
       isAutoConverting = false;
@@ -892,9 +894,6 @@
   document.addEventListener("input", (e) => {
     const el = resolveEditableTargetFromEventTarget(e.target);
     if (!isSupportedInput(el)) return;
-    if (settings.autoConvert && isInstagramHost() && !isPlainInput(el) && !isAutoConverting) {
-      tryInstagramAutoConvert(el);
-    }
     maybeShowSuggestion(el);
   }, true);
 
@@ -918,7 +917,18 @@
 
     if (!settings.autoConvert) return;
 
-    if (isInstagramHost() && !isPlainInput(el)) return;
+    if (isInstagramHost() && !isPlainInput(el)) {
+      // Schedule conversion via setTimeout(0) from keydown so it fires after
+      // the space input event AND Lexical's full async render have both finished.
+      if (settings.autoConvert && !isAutoConverting && e.key === " " && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        setTimeout(() => {
+          if (isAutoConverting) return;
+          const freshEl = getEditableTarget(document.activeElement) || getSelectionEditableTarget();
+          if (freshEl && !isPlainInput(freshEl)) tryInstagramAutoConvert(freshEl);
+        }, 0);
+      }
+      return;
+    }
 
     const isBoundaryKey = isBoundaryCommitKey(e);
     if (!isBoundaryKey || e.ctrlKey || e.metaKey || e.altKey) return;
