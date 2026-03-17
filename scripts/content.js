@@ -1,5 +1,7 @@
 (() => {
+  const SUPPORTED_LANGUAGES = new Set(["korean", "chinese", "japanese"]);
   let lastSuggestion = null;
+  let lastAutoConversion = null;
   let isAutoConverting = false;
   const TOOLTIP_CLASS = "layout-fix-tooltip";
   const ENGLISH_WORDS_RESOURCE = "data/english-words.txt";
@@ -62,6 +64,10 @@
     try {
       const stored = await chrome.storage.sync.get(DEFAULT_SETTINGS);
       settings = { ...DEFAULT_SETTINGS, ...stored };
+      if (!SUPPORTED_LANGUAGES.has(settings.language)) {
+        settings.language = DEFAULT_SETTINGS.language;
+        await chrome.storage.sync.set({ language: settings.language });
+      }
     } catch (error) {
       settings = { ...DEFAULT_SETTINGS };
     }
@@ -205,6 +211,10 @@
     const existing = document.querySelector(`.${TOOLTIP_CLASS}`);
     if (existing) existing.remove();
     lastSuggestion = null;
+  }
+
+  function clearLastAutoConversion() {
+    lastAutoConversion = null;
   }
 
   function getTooltipThemeStyles(themeName, darkMode) {
@@ -391,7 +401,7 @@
 
     const tooltip = document.createElement("div");
     tooltip.className = TOOLTIP_CLASS;
-    tooltip.textContent = `Convert to: ${suggestion} (Alt+L)`;
+    tooltip.textContent = `Convert to: ${suggestion}`;
 
     tooltip.style.position = "absolute";
     tooltip.style.padding = "8px 12px";
@@ -496,6 +506,56 @@
     return match ? match.length : 0;
   }
 
+  function getSpaceBoundaryLength(text, offset) {
+    const char = text[offset];
+    return char === " " || char === "\u00A0" ? 1 : 0;
+  }
+
+  function rememberAutoConversion(el, start, original, converted) {
+    if (!el || original === converted) {
+      clearLastAutoConversion();
+      return;
+    }
+
+    lastAutoConversion = {
+      el,
+      start,
+      original,
+      converted
+    };
+  }
+
+  function canUndoLastAutoConversion(el) {
+    if (!lastAutoConversion || lastAutoConversion.el !== el) return null;
+
+    const caret = getCaretOffset(el);
+    if (caret === null || caret === undefined) return null;
+
+    const text = getEditableText(el);
+    const { start, original, converted } = lastAutoConversion;
+    const convertedEnd = start + converted.length;
+    const boundaryLength = getSpaceBoundaryLength(text, convertedEnd);
+    if (!boundaryLength) return null;
+    if (caret !== convertedEnd + boundaryLength) return null;
+    if (text.slice(start, convertedEnd) !== converted) return null;
+
+    return {
+      start,
+      end: convertedEnd + boundaryLength,
+      replacement: original
+    };
+  }
+
+  function undoLastAutoConversion(el) {
+    const undoRange = canUndoLastAutoConversion(el);
+    if (!undoRange) return false;
+
+    replaceRange(el, undoRange.start, undoRange.end, undoRange.replacement);
+    clearLastAutoConversion();
+    removeSuggestion();
+    return true;
+  }
+
   function hasHangulAround(el, start, end) {
     const left = Math.max(0, start - 16);
     const text = getEditableText(el);
@@ -584,36 +644,6 @@
     return true;
   }
 
-  function isSpanishCandidate(input, converted) {
-    const mode = settings.contextMode || "balanced";
-    if (converted === input) return false;
-
-    const hasAccentMarker = /[ñáéíóúü¡¿]/i.test(converted);
-    const explicitTypingHint = /['~;:]/.test(input);
-
-    if (mode === "strict") {
-      return hasAccentMarker && (explicitTypingHint || input.length >= 5);
-    }
-    if (mode === "aggressive") {
-      return hasAccentMarker || explicitTypingHint;
-    }
-    return hasAccentMarker;
-  }
-
-  function isFrenchCandidate(input, converted) {
-    const mode = settings.contextMode || "balanced";
-    if (converted === input) return false;
-    const hasAccentMarker = /[àâçéèêëîïôùûüÿœæ]/i.test(converted);
-
-    if (mode === "strict") {
-      return hasAccentMarker && input.length >= 4;
-    }
-    if (mode === "aggressive") {
-      return hasAccentMarker || converted !== input;
-    }
-    return hasAccentMarker;
-  }
-
   function isChineseCandidate(el, wordInfo, input, converted) {
     const mode = settings.contextMode || "balanced";
     const normalized = normalizeLatinWord(input);
@@ -682,10 +712,6 @@
         return isJapaneseCandidate(el, wordInfo, wordInfo.word, converted);
       case "chinese":
         return isChineseCandidate(el, wordInfo, wordInfo.word, converted);
-      case "spanish":
-        return isSpanishCandidate(wordInfo.word, converted);
-      case "french":
-        return isFrenchCandidate(wordInfo.word, converted);
       case "korean":
       default:
         return isGoodKoreanCandidate(el, wordInfo, converted, candidate);
@@ -823,6 +849,14 @@
     return e.key === " " || e.key === "Enter" || e.key === "Tab" || e.key === "NumpadEnter";
   }
 
+  function shouldPreserveAutoConversionForKey(e) {
+    return e.key === "Shift"
+      || e.key === "Control"
+      || e.key === "Alt"
+      || e.key === "Meta"
+      || e.key === "CapsLock";
+  }
+
   function maybeShowSuggestion(el) {
     if (!isEnabledOnCurrentSite()) {
       removeSuggestion();
@@ -885,6 +919,7 @@
         sel.addRange(range);
         document.execCommand("insertText", false, candidate.text + " ");
       }
+      rememberAutoConversion(el, wordStart, word, candidate.text);
       removeSuggestion();
     } finally {
       isAutoConverting = false;
@@ -901,18 +936,22 @@
     const el = resolveEditableTargetFromEventTarget(e.target);
     if (!isSupportedInput(el)) return;
     if (e.isComposing) return;
-    if (!isEnabledOnCurrentSite()) {
-      removeSuggestion();
+
+    if (e.key === "Backspace" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (undoLastAutoConversion(el)) {
+        e.preventDefault();
+      }
       return;
     }
 
-    if (e.altKey && e.key.toLowerCase() === "l" && lastSuggestion && lastSuggestion.element === el) {
-      const currentWord = getCurrentWordAtCaret(el);
-      if (currentWord) {
-        replaceRange(el, currentWord.start, currentWord.end, lastSuggestion.suggestion);
-      }
+    if (!isEnabledOnCurrentSite()) {
       removeSuggestion();
+      clearLastAutoConversion();
       return;
+    }
+
+    if (lastAutoConversion && !shouldPreserveAutoConversionForKey(e)) {
+      clearLastAutoConversion();
     }
 
     if (!settings.autoConvert) return;
@@ -944,10 +983,18 @@
     }
 
     replaceRange(el, wordInfo.start, wordInfo.end, candidate.text);
+    if (e.key === " ") {
+      rememberAutoConversion(el, wordInfo.start, wordInfo.word, candidate.text);
+    } else {
+      clearLastAutoConversion();
+    }
     removeSuggestion();
   }, true);
 
-  document.addEventListener("click", removeSuggestion);
+  document.addEventListener("click", () => {
+    removeSuggestion();
+    clearLastAutoConversion();
+  });
 
   watchSettings();
   loadSettings().finally(refreshUIAfterSettingsChange);

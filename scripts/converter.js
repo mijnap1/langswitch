@@ -37,36 +37,6 @@
   const VOWEL_INDEX = Object.fromEntries(VOWELS.map((c, i) => [c, i]));
   const TAIL_INDEX = Object.fromEntries(TAILS.map((c, i) => [c, i]));
 
-  const FRENCH_ACCENT_WORDS = [
-    "à", "â", "âge", "août", "après", "ça", "café", "collège", "crème", "déjà",
-    "déjeuner", "dîner", "école", "économie", "électricité", "élève", "équipe",
-    "été", "étude", "état", "évident", "façade", "forêt", "français", "frère",
-    "gâteau", "garçon", "goût", "hôtel", "là", "leçon", "maïs", "même", "médecin",
-    "mère", "naïf", "noël", "où", "père", "pièce", "près", "première", "qualité",
-    "réunion", "rôle", "santé", "sécurité", "siècle", "sœur", "théâtre", "très",
-    "université", "voilà", "zéro", "être", "écrire", "était", "étais", "étions"
-  ];
-  const FRENCH_PLAIN_WORDS = new Set([
-    "a", "ai", "au", "aux", "avec", "bonjour", "ce", "ces", "comme", "dans",
-    "de", "des", "du", "elle", "en", "et", "il", "ils", "je", "la", "le",
-    "les", "leur", "mais", "mes", "mon", "ne", "nous", "ou", "par", "pas",
-    "pour", "que", "qui", "sa", "se", "ses", "son", "sur", "ta", "te", "tes",
-    "tu", "un", "une", "vos", "votre", "vous"
-  ]);
-
-  const SPANISH_ACCENT_WORDS = [
-    "adiós", "aquí", "allí", "aún", "camión", "canción", "cómo", "cuándo",
-    "cuánto", "día", "difícil", "dónde", "está", "están", "estás", "fácil",
-    "francés", "inglés", "jóvenes", "lápiz", "mamá", "más", "médico", "música",
-    "niño", "número", "papá", "país", "qué", "quién", "rápido", "sí", "también",
-    "teléfono", "tú", "último", "árbol", "él", "éxito", "índice", "práctica",
-    "público", "sofá", "corazón", "razón", "café", "estás", "estábamos", "inglés"
-  ];
-
-  const SPANISH_ACCENT_MAP = {
-    a: "á", e: "é", i: "í", o: "ó", u: "ú",
-    A: "Á", E: "É", I: "Í", O: "Ó", U: "Ú"
-  };
   const CHINESE_PINYIN_MAP = {
     ni: "你", hao: "好", ma: "吗", wo: "我", ai: "爱", ta: "他", men: "们",
     shi: "是", de: "的", bu: "不", zai: "在", you: "有", hen: "很", xiang: "想",
@@ -192,49 +162,6 @@
     chinese: false,
     japanese: false
   };
-
-  function stripAccents(text) {
-    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-
-  function buildAccentIndex(words) {
-    const index = {};
-    words.forEach((word) => {
-      const lower = word.toLowerCase();
-      const key = stripAccents(lower);
-      if (!(key in index)) {
-        index[key] = lower;
-      }
-    });
-    return index;
-  }
-
-  const FRENCH_ACCENT_INDEX = buildAccentIndex(FRENCH_ACCENT_WORDS);
-  const SPANISH_ACCENT_INDEX = buildAccentIndex(SPANISH_ACCENT_WORDS);
-
-  function applyCasePattern(template, word) {
-    if (template.toUpperCase() === template) {
-      return word.toUpperCase();
-    }
-
-    if (template[0] && template[0] === template[0].toUpperCase() && template.slice(1) === template.slice(1).toLowerCase()) {
-      return word[0].toUpperCase() + word.slice(1);
-    }
-
-    return word;
-  }
-
-  function maybeAccentFromIndex(input, accentIndex) {
-    const clean = input.replace(/[^A-Za-zÀ-ÿ'~]/g, "");
-    if (!clean) return input;
-
-    const lower = clean.toLowerCase();
-    const lookup = stripAccents(lower);
-    const accented = accentIndex[lookup];
-    if (!accented || accented === lower) return input;
-
-    return applyCasePattern(clean, accented);
-  }
 
   function addRuntimeCandidate(language, key, value, score = 1) {
     if (!key || !value) return;
@@ -400,30 +327,6 @@
     return composeFromJamo(keysToJamo(input));
   }
 
-  function convertToFrench(input) {
-    const clean = input.replace(/[^A-Za-zÀ-ÿ]/g, "").toLowerCase();
-    if (FRENCH_PLAIN_WORDS.has(clean)) {
-      return input;
-    }
-    return maybeAccentFromIndex(input, FRENCH_ACCENT_INDEX);
-  }
-
-  function convertToSpanish(input) {
-    let out = input;
-
-    out = out.replace(/([nN])~/g, (_, n) => (n === "N" ? "Ñ" : "ñ"));
-    out = out.replace(/~([nN])/g, (_, n) => (n === "N" ? "Ñ" : "ñ"));
-
-    Object.entries(SPANISH_ACCENT_MAP).forEach(([plain, accented]) => {
-      const before = new RegExp(`${plain}'`, "g");
-      const after = new RegExp(`'${plain}`, "g");
-      out = out.replace(before, accented).replace(after, accented);
-    });
-
-    out = out.replace(/;/g, "ñ").replace(/:/g, "Ñ");
-    return maybeAccentFromIndex(out, SPANISH_ACCENT_INDEX);
-  }
-
   function normalizePinyin(input) {
     // 'v' is kept as-is (falls within a-z) since it substitutes ü in many input methods (nv→女, lv→旅)
     return input.toLowerCase().replace(/[^a-z]/g, "");
@@ -526,10 +429,6 @@
         return convertToJapanese(input);
       case "chinese":
         return convertToChinese(input);
-      case "spanish":
-        return convertToSpanish(input);
-      case "french":
-        return convertToFrench(input);
       case "korean":
       default:
         return convertToKorean(input);

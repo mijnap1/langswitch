@@ -1,4 +1,5 @@
 (() => {
+  const SUPPORTED_LANGUAGES = new Set(["korean", "chinese", "japanese"]);
   const DEFAULT_SETTINGS = {
     language: "korean",
     contextMode: "balanced",
@@ -64,6 +65,10 @@
   async function loadSettings() {
     currentHost = await getCurrentHost();
     loadedSettings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+    if (!SUPPORTED_LANGUAGES.has(loadedSettings.language)) {
+      loadedSettings.language = DEFAULT_SETTINGS.language;
+      await chrome.storage.sync.set({ language: loadedSettings.language });
+    }
 
     languageEl.value = loadedSettings.language;
     contextModeEl.value = loadedSettings.contextMode;

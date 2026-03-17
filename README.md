@@ -1,11 +1,11 @@
 # LangSwitch
 
-A Chrome extension that converts mistyped keyboard-layout input directly in text fields. Built for multilingual typing works fully locally, no internet required.
+A Chrome extension that detects mistyped keyboard-layout input in text fields and suggests local conversion. Supports Korean, Chinese, and Japanese typing workflows and runs fully locally.
 
 
 ## How It Works
 
-Type naturally with your keyboard. LangSwitch detects when your input looks like a mistyped layout and shows a suggestion tooltip. Press `Alt + L` to apply it instantly, or enable auto-convert to have it apply on `Space` / `Enter` / `Tab`.
+Type naturally with your keyboard. LangSwitch detects when your input looks like a mistyped layout and shows a suggestion tooltip. You can apply the suggestion manually or enable auto-convert to have it apply on `Space` / `Enter` / `Tab`.
 
 
 ## Languages
@@ -33,12 +33,12 @@ Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta`
 
 ## Features
 
-- Suggestion tooltip with `Alt + L` quick-apply
+- Suggestion tooltip with manual apply
 - Auto-convert on `Space` / `Enter` / `Tab`
 - Context modes `Strict`, `Balanced`, `Aggressive`
 - Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, ㄱㄱ, ...)
 - Per-site enable / disable rules
-- 10 tooltip themes Light / Dark / Auto
+- 10 tooltip themes with Light / Dark / Auto appearance modes
 
 ## Privacy
 
