@@ -123,7 +123,7 @@
       return true;
     }
 
-    const supportedTypes = new Set(["", "text", "search", "url", "tel", "email", "password"]);
+    const supportedTypes = new Set(["", "text", "search", "url", "tel", "email"]);
     return supportedTypes.has(el.type);
   }
 

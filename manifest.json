@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LangSwitch",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Detect mistyped keyboard layout and suggest local conversion.",
   "icons": {
     "16": "assets/icon16.png",
