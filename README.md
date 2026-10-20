@@ -28,25 +28,68 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
 
 ## Features
 
-| | |
-|---|---|
-| **Both directions** | English keys become Korean, and English typed in Korean mode comes back: `ㅗ디ㅣㅐ` → `hello`. |
-| **Reads the sentence** | English stays English and Korean stays Korean. Words that could be either, like `so` / 내, follow the words around them. |
-| **Easy undo** | Press Backspace right after a conversion to get your text back. Undo the same word twice and it won't convert again. |
-| **Your call** | Strict, Balanced, or Eager sensitivity, and an on/off switch for each site. |
-| **Looks right** | 10 tooltip themes, including Liquid Glass, in light, dark, or auto. |
+<table>
+  <tr>
+    <td width="30%"><b>Both directions</b></td>
+    <td>English keys become Korean, and English typed in Korean mode comes back. ㅗ디ㅣㅐ → hello</td>
+  </tr>
+  <tr>
+    <td><b>Reads the sentence</b></td>
+    <td>English stays English and Korean stays Korean. Words that could be either follow the words around them.</td>
+  </tr>
+  <tr>
+    <td><b>Easy undo</b></td>
+    <td>Press Backspace right after a conversion to get your text back. Undo a word twice and it's left alone for good.</td>
+  </tr>
+  <tr>
+    <td><b>Your call</b></td>
+    <td>Strict, Balanced, or Eager sensitivity, and an on/off switch for each site.</td>
+  </tr>
+  <tr>
+    <td><b>Looks right</b></td>
+    <td>10 tooltip themes, including Liquid Glass, in light, dark, or auto.</td>
+  </tr>
+</table>
 
 ## Languages
 
-| | You type | You get |
-|---|---|---|
-| **Korean** · Dubeolsik | `dkssudgktpdy` | 안녕하세요 |
-| **Chinese** · Pinyin | `nihao` | 你好 |
-| **Japanese** · Romaji | `arigatou` | ありがとう |
-
-- **Korean** also handles chat shorthand like ㅋㅋ, ㅇㅋ, and ㄱㄱ.
-- **Chinese** takes pinyin without tones. Use `v` for `ü` (`nv` → 女), and punctuation converts too (`nihao,` → `你好，`).
-- **Japanese** takes Hepburn or Wāpuro romaji, doubles consonants into っ (`katta` → かった), and has a kana-only mode.
+<table align="center">
+  <tr>
+    <td align="center" valign="top" width="33%">
+      <h3>한</h3>
+      <b>Korean</b><br>
+      <sub>DUBEOLSIK</sub>
+      <br><br>
+      <code>dkssudgktpdy</code><br>
+      ↓<br>
+      안녕하세요
+      <br><br>
+      <sub>ㅗ디ㅣㅐ&nbsp;→&nbsp;hello&nbsp;too<br>Shorthand&nbsp;like&nbsp;ㅋㅋ</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <h3>中</h3>
+      <b>Chinese</b><br>
+      <sub>PINYIN</sub>
+      <br><br>
+      <code>nihao</code><br>
+      ↓<br>
+      你好
+      <br><br>
+      <sub>v&nbsp;for&nbsp;ü:&nbsp;nv&nbsp;→&nbsp;女<br>Chinese&nbsp;punctuation</sub>
+    </td>
+    <td align="center" valign="top" width="33%">
+      <h3>あ</h3>
+      <b>Japanese</b><br>
+      <sub>ROMAJI</sub>
+      <br><br>
+      <code>arigatou</code><br>
+      ↓<br>
+      ありがとう
+      <br><br>
+      <sub>katta&nbsp;→&nbsp;かった<br>Kana-only&nbsp;mode</sub>
+    </td>
+  </tr>
+</table>
 
 <details>
 <summary>Screenshots</summary>
@@ -61,12 +104,11 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
 
 ## Get started
 
-1. Download or clone this repository.
-2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and pick the folder that contains `manifest.json`.
-4. Open the LangSwitch popup and choose your language.
+1. Clone or download this repository.
+2. Open `chrome://extensions`, turn on **Developer mode**, and click **Load unpacked**.
+3. Pick the folder with `manifest.json`, then choose your language in the popup.
 
-Then type one of the examples above in any text field and press **Space**.
+Type `dkssud` in any text field and press **Space**.
 
 > [!NOTE]
 > Instagram and Discord start paused while their editors get proper support. You can turn them on from the popup, but conversions there may not stick.
