@@ -1,130 +1,138 @@
+<div align="center">
+
+<img src="assets/icon128.png" width="112" alt="LangSwitch icon">
+
 # LangSwitch
 
-A Chrome extension that detects mistyped keyboard-layout input in text fields and suggests local conversion. Supports Korean, Chinese, and Japanese typing workflows and runs fully locally.
+**Wrong keyboard. Right words.**
 
+A Chrome extension that fixes text typed in the wrong keyboard layout, as you type.
 
-## How It Works
+<img src="https://img.shields.io/badge/version-0.3.0-7c9cff?style=flat" alt="Version 0.3.0">
+<img src="https://img.shields.io/badge/platform-Chrome-7c9cff?style=flat" alt="Chrome extension">
+<img src="https://img.shields.io/badge/languages-KO%20%C2%B7%20ZH%20%C2%B7%20JA-64748b?style=flat" alt="Korean, Chinese, Japanese">
+<img src="https://img.shields.io/badge/processing-local-4ade80?style=flat" alt="Local processing">
 
-Type naturally with your keyboard. LangSwitch detects when your input looks like a mistyped layout and shows a suggestion tooltip. With auto-convert on, the fix is applied on `Space` / `Enter` / `Tab`.
+<br>
+<br>
 
-For Korean, each word is scored as Korean *and* as English before anything changes:
+<img src="docs/readme/demo.svg" width="100%" alt="Typing dkssudgktpdy and pressing Space turns it into 안녕하세요. The same happens for ㅗ디ㅣㅐ to hello, nihao to 你好, and arigatou to ありがとう.">
 
-- **Korean evidence**: how common its syllables are, whether it is a known word, and whether it ends in a particle or verb ending (학교**에서**, 공부**했어**)
-- **English evidence**: everyday words count far more than the long tail of rare dictionary entries
-- **Context**: the words around it, plus the language you've been typing on the page recently
+[Get started](#get-started) &nbsp;·&nbsp; [Languages](#languages) &nbsp;·&nbsp; [Privacy](#privacy)
 
-Ambiguous words like `go` / 해 or `so` / 내 follow the sentence they're in. When a word converts, the one or two words before it get re-checked with the new context, so a short first word (`sk` → 나) is fixed as soon as the sentence makes its language clear.
+</div>
 
+<br>
 
-## Languages
-
-### 🇰🇷 Korean (Dubeolsik)
-
-Type English keys as if your layout were Dubeolsik. LangSwitch composes the correct Hangul syllables and recognises common Korean slang (ㅋㅋ, ㅇㅋ, ㄱㅅ, etc.).
-
-It also works the other way: English typed while the Korean IME is on (`ㅗ디ㅣㅐ ㅈㅐ깅`) is turned back into `hello world`.
-
-![Korean](assets/screenshots/1.png)
-
-
-### 🇨🇳 Chinese (Pinyin)
-
-Type pinyin without spaces or tone marks. Use `v` in place of `ü` (e.g. `nv` → 女, `lv` → 旅) just like standard Windows IME input.
-
-Typing `,` `.` `?` `!` right after a word converts it and adds Chinese punctuation (`nihao,` → `你好，`).
-
-![Chinese](assets/screenshots/2.png)
-
-
-### 🇯🇵 Japanese (Romaji)
-
-Type standard romaji. Doubled consonants automatically produce っ (e.g. `katta` → かった). Both Hepburn and Wāpuro styles are supported.
-
-Punctuation works the same way (`arigatou.` → `ありがとう。`), and **Kana only** spells words out in hiragana instead of kanji (`watashi` → わたし).
-
-![Japanese](assets/screenshots/3.png)
-
+Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type and applies it when you press **Space**, **Enter**, or **Tab**.
 
 ## Features
 
-- Suggestion tooltip
-- Auto-convert on `Space` / `Enter` / `Tab`
-- Reverse conversion for English typed in Korean mode (ㅗ디ㅣㅐ → hello)
-- Undo with `Backspace` right after a conversion; a word undone twice is never auto-converted again (manage the list in the popup)
-- Context modes `Strict`, `Balanced`, `Aggressive`
-- Korean slang mode (ㅋㅋ, ㅇㅋ, ㄱㅅ, ㄱㄱ, ...)
-- Per-site enable / disable rules (Instagram and Discord start paused for now; switch them on from the popup)
-- 10 tooltip themes with a live preview, including Liquid Glass with real edge refraction in Chrome
-- Light / Dark / Auto appearance; in Auto, Liquid Glass matches the page behind it
+| | |
+|---|---|
+| **Both directions** | English keys become Korean, and English typed in Korean mode comes back: `ㅗ디ㅣㅐ` → `hello`. |
+| **Reads the sentence** | English stays English and Korean stays Korean. Words that could be either, like `so` / 내, follow the words around them. |
+| **Easy undo** | Press Backspace right after a conversion to get your text back. Undo the same word twice and it won't convert again. |
+| **Your call** | Strict, Balanced, or Eager sensitivity, and an on/off switch for each site. |
+| **Looks right** | 10 tooltip themes, including Liquid Glass, in light, dark, or auto. |
+
+## Languages
+
+| | You type | You get |
+|---|---|---|
+| **Korean** · Dubeolsik | `dkssudgktpdy` | 안녕하세요 |
+| **Chinese** · Pinyin | `nihao` | 你好 |
+| **Japanese** · Romaji | `arigatou` | ありがとう |
+
+- **Korean** also handles chat shorthand like ㅋㅋ, ㅇㅋ, and ㄱㄱ.
+- **Chinese** takes pinyin without tones. Use `v` for `ü` (`nv` → 女), and punctuation converts too (`nihao,` → `你好，`).
+- **Japanese** takes Hepburn or Wāpuro romaji, doubles consonants into っ (`katta` → かった), and has a kana-only mode.
+
+<details>
+<summary>Screenshots</summary>
+<br>
+
+<img src="assets/screenshots/store-1-korean.jpg" width="100%" alt="Korean conversion">
+<img src="assets/screenshots/store-2-chinese.jpg" width="100%" alt="Chinese conversion">
+<img src="assets/screenshots/store-3-japanese.jpg" width="100%" alt="Japanese conversion">
+<img src="assets/screenshots/store-4-settings.jpg" width="100%" alt="Settings popup">
+
+</details>
+
+## Get started
+
+1. Download or clone this repository.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and pick the folder that contains `manifest.json`.
+4. Open the LangSwitch popup and choose your language.
+
+Then type one of the examples above in any text field and press **Space**.
+
+> [!NOTE]
+> Instagram and Discord start paused while their editors get proper support. You can turn them on from the popup, but conversions there may not stick.
+
+> [!TIP]
+> In chat apps, **Enter** sends your message before LangSwitch can convert the last word. End with a Space if it needs fixing.
 
 ## Privacy
 
-All processing is local. No keystrokes, no content, and no data of any kind is sent to external servers.
+Everything runs on your device. What you type is never sent anywhere, and password fields are never touched. Settings and your never-convert list are stored in the browser.
 
+<details>
+<summary>Permissions</summary>
+<br>
 
-## Setup
-
-1. Go to `chrome://extensions` in Chrome
-2. Enable **Developer mode**
-3. Click **Load unpacked** and select the `LangSwitch` folder
-
-## Quick Test
-
-1. Load `demo/index.html` with the extension active
-2. Select a language in the popup
-3. Type a phrase from the reference table and press `Space`
-
-Without installing the extension, serve the repo (`python3 -m http.server`) and open `/tests/playground.html`. It runs the real content scripts with a mocked `chrome` API. `/tests/editors.html` does the same inside real Lexical (Instagram) and Slate (Discord) editors and shows each editor's own text model, which is what the app would actually send.
-
-### Detector tests
-
-```bash
-node tests/detector.test.js            # accuracy per scenario
-node tests/detector.test.js --verbose  # list every wrong word
-node tests/detector.test.js --all-modes
-```
-
-The suite types Korean, English and mixed sentences word by word (including held-out sentences outside the word lists) in both directions and reports how many words ended up in the intended language.
-
-
-## Project Structure
-
-```
-LangSwitch/
-├── manifest.json
-├── assets/
-├── scripts/
-│   ├── converter.js      # key ↔ Hangul / pinyin / romaji conversion
-│   ├── detector.js       # Korean vs English scoring model
-│   ├── themes.js         # tooltip themes (shared with the popup preview)
-│   └── content.js        # field handling, auto-convert, undo, tooltips
-├── ui/
-│   ├── popup.html
-│   ├── popup.css
-│   └── popup.js
-├── data/
-│   ├── english-words.txt   # large dictionary (weak evidence)
-│   ├── english-common.txt  # everyday English (strong evidence)
-│   ├── korean-words.txt    # common Korean words (evidence, keys derived at runtime)
-│   ├── korean-dict.tsv
-│   ├── chinese-dict.tsv
-│   └── japanese-dict.tsv
-├── demo/
-│   └── index.html
-└── tests/
-    ├── detector.test.js
-    ├── editors.html
-    └── playground.html
-```
-
-
-## Permissions
-
-| Permission | Reason |
+| Permission | Used for |
 |---|---|
-| `storage` | Save user settings and the never-convert word list |
-| `tabs` + `activeTab` | Read current domain for per-site toggle |
-| Host access | Detect and convert input on any page |
+| `storage` | Settings and the never-convert list |
+| `tabs` + `activeTab` | Knowing the current site for the on/off switch |
+| Host access | Reading and fixing text fields on web pages |
 
+</details>
 
-Add a `LICENSE` file before release MIT is recommended.
+## Development
+
+There's no build step. After editing, click **Reload** on `chrome://extensions` and refresh the page you're testing.
+
+```sh
+node tests/detector.test.js              # accuracy per scenario
+node tests/detector.test.js --verbose    # list every wrong word
+```
+
+To try it without installing, serve the repo and open the test pages:
+
+```sh
+python3 -m http.server 8000
+```
+
+- [`tests/playground.html`](http://localhost:8000/tests/playground.html): the real content scripts with a mocked Chrome API
+- [`tests/editors.html`](http://localhost:8000/tests/editors.html): real Lexical (Instagram) and Slate (Discord) editors, with each editor's own text shown
+
+<details>
+<summary>How Korean detection works</summary>
+<br>
+
+Each word gets two scores: how much it looks like Korean (common syllables, known words, particles and endings) and how much it looks like English (everyday words count far more than rare dictionary entries). The words around it and what you've been typing on the page tip the balance.
+
+When a word converts, the one or two words before it are checked again, so a short first word gets fixed once the sentence makes its language clear. The test suite types Korean, English, and mixed sentences in both directions, including sentences outside the word lists.
+
+</details>
+
+<details>
+<summary>Project layout</summary>
+<br>
+
+| Folder | Contents |
+|---|---|
+| `scripts/` | Conversion, language detection, text field handling, tooltip themes |
+| `ui/` | The popup |
+| `data/` | Dictionaries and word lists |
+| `assets/` | Icons and store screenshots (`render.js` regenerates them) |
+| `docs/readme/` | The demo animation (`make_demo.py` regenerates it) |
+| `tests/` | Detector tests and browser test pages |
+
+</details>
+
+<br>
+
+<div align="center"><sub>Less retyping. Keep going.</sub></div>
