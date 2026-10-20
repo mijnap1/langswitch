@@ -28,7 +28,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
 
 ## Features
 
-<table>
+<table width="100%">
   <tr>
     <td width="30%"><b>Both directions</b></td>
     <td>English keys become Korean, and English typed in Korean mode comes back. ㅗ디ㅣㅐ → hello</td>
@@ -53,9 +53,9 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
 
 ## Languages
 
-<table>
+<table width="100%">
   <tr>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="33%">
       <h3>한</h3>
       <b>Korean</b><br>
       <sub>DUBEOLSIK</sub>
@@ -64,9 +64,9 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       안녕하세요
       <br><br>
-      <sub>Also fixes ㅗ디ㅣㅐ → hello<br>and chat shorthand like ㅋㅋ</sub>
+      <sub>Also ㅗ디ㅣㅐ → hello<br>and shorthand like ㅋㅋ</sub>
     </td>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="33%">
       <h3>中</h3>
       <b>Chinese</b><br>
       <sub>PINYIN</sub>
@@ -75,9 +75,9 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       你好
       <br><br>
-      <sub>Type v for ü, as in nv → 女<br>Punctuation converts too</sub>
+      <sub>v for ü: nv → 女<br>Punctuation converts too</sub>
     </td>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="33%">
       <h3>あ</h3>
       <b>Japanese</b><br>
       <sub>ROMAJI</sub>
@@ -86,7 +86,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       ありがとう
       <br><br>
-      <sub>Double consonants become っ<br>Kana-only mode if you skip kanji</sub>
+      <sub>katta → かった<br>Optional kana-only mode</sub>
     </td>
   </tr>
 </table>
