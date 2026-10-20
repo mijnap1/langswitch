@@ -53,7 +53,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
 
 ## Languages
 
-<table>
+<table align="center">
   <tr>
     <td align="center" valign="top" width="33%">
       <h3>한</h3>
@@ -64,7 +64,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       안녕하세요
       <br><br>
-      <sub>ㅗ디ㅣㅐ → hello too<br>Shorthand like ㅋㅋ</sub>
+      <sub>ㅗ디ㅣㅐ&nbsp;→&nbsp;hello&nbsp;too<br>Shorthand&nbsp;like&nbsp;ㅋㅋ</sub>
     </td>
     <td align="center" valign="top" width="33%">
       <h3>中</h3>
@@ -75,7 +75,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       你好
       <br><br>
-      <sub>v for ü: nv → 女<br>Chinese punctuation</sub>
+      <sub>v&nbsp;for&nbsp;ü:&nbsp;nv&nbsp;→&nbsp;女<br>Chinese&nbsp;punctuation</sub>
     </td>
     <td align="center" valign="top" width="33%">
       <h3>あ</h3>
@@ -86,7 +86,7 @@ Typed `dkssud` when you meant `안녕`? LangSwitch shows the fix while you type 
       ↓<br>
       ありがとう
       <br><br>
-      <sub>katta → かった<br>Kana-only mode</sub>
+      <sub>katta&nbsp;→&nbsp;かった<br>Kana-only&nbsp;mode</sub>
     </td>
   </tr>
 </table>
