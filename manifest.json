@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "LangSwitch",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Detect mistyped keyboard layout and suggest local conversion.",
   "icons": {
     "16": "assets/icon16.png",
@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["scripts/converter.js", "scripts/content.js"],
+      "js": ["scripts/converter.js", "scripts/detector.js", "scripts/themes.js", "scripts/content.js"],
       "run_at": "document_idle",
       "all_frames": true,
       "match_about_blank": true
@@ -33,6 +33,8 @@
     {
       "resources": [
         "data/english-words.txt",
+        "data/english-common.txt",
+        "data/korean-words.txt",
         "data/korean-dict.tsv",
         "data/chinese-dict.tsv",
         "data/japanese-dict.tsv"

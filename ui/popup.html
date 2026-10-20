@@ -8,72 +8,114 @@
 </head>
 <body>
   <main class="panel">
-    <div class="header">
-      <img src="../assets/favicon.svg" alt="LangSwitch" class="logo" />
+    <header class="header">
+      <img src="../assets/favicon.svg" alt="" class="logo" />
       <h1>LangSwitch</h1>
+      <span class="version" id="version"></span>
+    </header>
+
+    <div class="site-bar" id="siteBar">
+      <span class="site-icon" aria-hidden="true">
+        <img id="siteFavicon" alt="" hidden />
+        <svg id="siteGlobe" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3">
+          <circle cx="8" cy="8" r="6.25" />
+          <path d="M1.75 8h12.5M8 1.75c1.7 1.8 2.5 3.9 2.5 6.25S9.7 12.45 8 14.25C6.3 12.45 5.5 10.35 5.5 8S6.3 3.55 8 1.75Z" />
+        </svg>
+      </span>
+      <span class="site-text" id="siteToggleLabel">This site</span>
+      <label class="switch" title="Enable on this site">
+        <input type="checkbox" id="siteEnabled" />
+        <span class="switch-track"></span>
+      </label>
     </div>
 
-    <label class="field">
-      <span>Language</span>
-      <select id="language">
-        <option value="korean">Korean (Dubeolsik)</option>
-        <option value="chinese">Chinese (Pinyin)</option>
-        <option value="japanese">Japanese (Romaji)</option>
-      </select>
-    </label>
+    <section class="group">
+      <h2>Language</h2>
+      <div class="segmented segmented-lang" role="radiogroup" aria-label="Language">
+        <label><input type="radio" name="language" value="korean" /><span><b>한</b>Korean</span></label>
+        <label><input type="radio" name="language" value="chinese" /><span><b>中</b>Chinese</span></label>
+        <label><input type="radio" name="language" value="japanese" /><span><b>あ</b>Japanese</span></label>
+      </div>
+    </section>
 
-    <label class="field">
-      <span>Context Mode</span>
-      <select id="contextMode">
-        <option value="strict">Strict (few conversions)</option>
-        <option value="balanced">Balanced</option>
-        <option value="aggressive">Aggressive (more conversions)</option>
-      </select>
-    </label>
+    <section class="group">
+      <h2>Sensitivity</h2>
+      <div class="segmented" role="radiogroup" aria-label="Sensitivity">
+        <label><input type="radio" name="contextMode" value="strict" /><span>Strict</span></label>
+        <label><input type="radio" name="contextMode" value="balanced" /><span>Balanced</span></label>
+        <label><input type="radio" name="contextMode" value="aggressive" /><span>Eager</span></label>
+      </div>
+      <p class="hint" id="contextModeHint"></p>
+    </section>
 
-    <label class="field">
-      <span>Tooltip Theme</span>
-      <select id="tooltipTheme">
-        <option value="liquid-glass">Liquid Glass</option>
-        <option value="soft-minimal">Soft Minimal</option>
-        <option value="arctic-frost">Arctic Frost</option>
-        <option value="obsidian-edge">Obsidian Edge</option>
-        <option value="warm-paper">Warm Paper</option>
-        <option value="moss-satin">Moss Satin</option>
-        <option value="sunset-clay">Sunset Clay</option>
-        <option value="mono-ink">Mono Ink</option>
-        <option value="neon-pulse">Neon Pulse</option>
-        <option value="terminal">Terminal</option>
-      </select>
-    </label>
+    <section class="card">
+      <label class="row">
+        <span class="row-text">
+          <span class="row-title">Auto-convert</span>
+          <span class="row-sub">Fix words on Space, Enter or Tab</span>
+        </span>
+        <span class="switch"><input type="checkbox" id="autoConvert" /><span class="switch-track"></span></span>
+      </label>
+      <!-- Filled per language by popup.js (Korean: reverse + shorthand, Chinese/Japanese: their own options). -->
+      <label class="row">
+        <span class="row-text">
+          <span class="row-title" id="langOptionATitle"></span>
+          <span class="row-sub" id="langOptionASub"></span>
+        </span>
+        <span class="switch"><input type="checkbox" id="langOptionA" /><span class="switch-track"></span></span>
+      </label>
+      <label class="row">
+        <span class="row-text">
+          <span class="row-title" id="langOptionBTitle"></span>
+          <span class="row-sub" id="langOptionBSub"></span>
+        </span>
+        <span class="switch"><input type="checkbox" id="langOptionB" /><span class="switch-track"></span></span>
+      </label>
+    </section>
 
-    <label class="field">
-      <span>Appearance</span>
-      <select id="appearance">
-        <option value="auto">Auto (System)</option>
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-      </select>
-    </label>
+    <section class="group">
+      <div class="group-head">
+        <h2>Never auto-convert</h2>
+        <button type="button" id="clearLearned" class="text-button">Clear</button>
+      </div>
+      <ul id="learnedList" class="chips"></ul>
+      <p class="hint" id="learnedEmpty">Press ⌫ right after a conversion to undo it. Undo the same word twice and it won't be converted again.</p>
+    </section>
 
-    <label class="toggle">
-      <input type="checkbox" id="autoConvert" />
-      <span>Auto-convert on Space/Enter/Tab</span>
-    </label>
+    <section class="group">
+      <h2>Tooltip</h2>
+      <div class="inline">
+        <div class="select-wrap">
+          <select id="tooltipTheme" aria-label="Tooltip theme">
+            <option value="liquid-glass">Liquid Glass</option>
+            <option value="soft-minimal">Soft Minimal</option>
+            <option value="arctic-frost">Arctic Frost</option>
+            <option value="obsidian-edge">Obsidian Edge</option>
+            <option value="warm-paper">Warm Paper</option>
+            <option value="moss-satin">Moss Satin</option>
+            <option value="sunset-clay">Sunset Clay</option>
+            <option value="mono-ink">Mono Ink</option>
+            <option value="neon-pulse">Neon Pulse</option>
+            <option value="terminal">Terminal</option>
+          </select>
+        </div>
+        <div class="segmented segmented-compact" role="radiogroup" aria-label="Appearance">
+          <label title="Follow system"><input type="radio" name="appearance" value="auto" /><span>Auto</span></label>
+          <label title="Light"><input type="radio" name="appearance" value="light" /><span>Light</span></label>
+          <label title="Dark"><input type="radio" name="appearance" value="dark" /><span>Dark</span></label>
+        </div>
+      </div>
+      <div class="preview" id="themePreview" aria-hidden="true">
+        <div class="preview-page">
+          <div class="preview-field"><span id="previewText"></span><span class="preview-caret"></span></div>
+        </div>
+      </div>
+    </section>
 
-    <label class="toggle" id="koreanSlangRow">
-      <input type="checkbox" id="koreanSlangMode" />
-      <span>Korean slang mode (ㅇㅇ / ㅇㅋ / ㄱㄱ)</span>
-    </label>
-
-    <label class="toggle site-toggle">
-      <input type="checkbox" id="siteEnabled" />
-      <span id="siteToggleLabel">Enable on this site</span>
-    </label>
-
-    <p id="status" aria-live="polite"></p>
+    <p id="status" class="toast" role="status" aria-live="polite"></p>
   </main>
 
+  <script src="../scripts/themes.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
