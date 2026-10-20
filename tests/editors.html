@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LangSwitch Editors</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: #f8fafc;
+      color: #0f172a;
+      font: 14px/1.5 -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 720px; margin: 0 auto; display: grid; gap: 16px; }
+    h1 { margin: 0; font-size: 20px; }
+    p { margin: 0; color: #64748b; }
+    .editor {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      outline: none;
+    }
+    code { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Rich editor check</h1>
+    <p>Real Lexical (Instagram) and Slate (Discord) editors with the LangSwitch content scripts loaded. The model line under each editor is what the app would actually send.</p>
+
+    <label>Lexical (rejects synthetic input, like Instagram) <div class="editor" id="lexical" contenteditable="true"></div></label>
+    <p>Model: <code id="lexicalModel"></code></p>
+
+    <label>Slate <div id="slate"></div></label>
+    <p>Model: <code id="slateModel"></code></p>
+  </main>
+
+  <script>
+    // Same chrome.* mock as playground.html.
+    (() => {
+      const listeners = [];
+      const areas = { sync: {}, local: {} };
+      const makeArea = (name) => ({
+        async get(defaults) {
+          return { ...(defaults || {}), ...areas[name] };
+        },
+        async set(values) {
+          const changes = {};
+          Object.entries(values).forEach(([key, value]) => {
+            changes[key] = { oldValue: areas[name][key], newValue: value };
+            areas[name][key] = value;
+          });
+          listeners.forEach((fn) => fn(changes, name));
+        }
+      });
+      window.chrome = window.chrome || {};
+      window.chrome.runtime = { getURL: (path) => `../${path}?t=${Date.now()}` };
+      window.chrome.storage = {
+        sync: makeArea("sync"),
+        local: makeArea("local"),
+        onChanged: { addListener: (fn) => listeners.push(fn) }
+      };
+      ["converter.js", "detector.js", "themes.js", "content.js"].forEach((name) => {
+        const script = document.createElement("script");
+        script.src = `../scripts/${name}?t=${Date.now()}`;
+        script.async = false;
+        document.head.appendChild(script);
+      });
+    })();
+  </script>
+
+  <script type="module">
+    // ?lexical=<version> to try another release (Instagram ships a recent one).
+    const version = new URLSearchParams(location.search).get("lexical") || "0.23.1";
+    const { createEditor, $getRoot } = await import(`https://esm.sh/lexical@${version}`);
+    const { registerPlainText } = await import(`https://esm.sh/@lexical/plain-text@${version}?deps=lexical@${version}`);
+
+    const editor = createEditor({ namespace: "check", onError: (error) => console.error(error) });
+    const lexicalRoot = document.getElementById("lexical");
+    // Like Instagram's composer: synthetic (untrusted) input events are swallowed.
+    lexicalRoot.addEventListener("beforeinput", (event) => {
+      if (!event.isTrusted) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+    editor.setRootElement(lexicalRoot);
+    registerPlainText(editor);
+    editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        document.getElementById("lexicalModel").textContent = JSON.stringify($getRoot().getTextContent());
+      });
+    });
+    window.lexicalEditor = editor;
+  </script>
+
+  <script type="module">
+    import React from "https://esm.sh/react@18.3.1";
+    import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+    import { createEditor, Node } from "https://esm.sh/slate@0.103.0";
+    import { Slate, Editable, withReact } from "https://esm.sh/slate-react@0.108.0?deps=react@18.3.1,react-dom@18.3.1,slate@0.103.0";
+
+    const initialValue = [{ type: "paragraph", children: [{ text: "" }] }];
+    function App() {
+      const [editor] = React.useState(() => withReact(createEditor()));
+      return React.createElement(
+        Slate,
+        {
+          editor,
+          initialValue,
+          onChange: (value) => {
+            document.getElementById("slateModel").textContent = JSON.stringify(value.map((n) => Node.string(n)).join("\n"));
+          }
+        },
+        React.createElement(Editable, { className: "editor", id: "slateEditable" })
+      );
+    }
+    createRoot(document.getElementById("slate")).render(React.createElement(App));
+  </script>
+</body>
+</html>

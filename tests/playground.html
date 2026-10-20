@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LangSwitch Playground</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --fg: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --field: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --fg: #e2e8f0;
+        --muted: #94a3b8;
+        --border: #334155;
+        --field: #111827;
+      }
+    }
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--fg);
+      font: 14px/1.5 "Inter", "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+    h1 { margin: 0; font-size: 20px; }
+    p { margin: 0; color: var(--muted); }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    select, textarea, input[type="text"], [contenteditable] {
+      font: inherit;
+      color: inherit;
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    textarea, input[type="text"], [contenteditable] { width: 100%; box-sizing: border-box; }
+    textarea { min-height: 90px; }
+    [contenteditable] { min-height: 60px; }
+    label { display: grid; gap: 4px; }
+    code { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>LangSwitch playground</h1>
+    <p>Runs the real content scripts with a mocked <code>chrome</code> API, so you can try conversions without loading the extension. Serve the repo root (for example <code>python3 -m http.server</code>) and open <code>/tests/playground.html</code>.</p>
+
+    <div class="controls">
+      <select id="language">
+        <option value="korean">Korean</option>
+        <option value="chinese">Chinese</option>
+        <option value="japanese">Japanese</option>
+      </select>
+      <select id="contextMode">
+        <option value="strict">Strict</option>
+        <option value="balanced" selected>Balanced</option>
+        <option value="aggressive">Aggressive</option>
+      </select>
+      <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="reverseConvert" checked /> Reverse (Hangul → English)</label>
+    </div>
+
+    <label>Textarea <textarea id="area" placeholder="Try: dkssudgktpdy wlrma anjgo / hello how are you"></textarea></label>
+    <label>Input <input type="text" id="line" /></label>
+    <label>Contenteditable <div contenteditable="true" id="rich"></div></label>
+    <p>Learned (never convert): <code id="learned">none</code></p>
+  </main>
+
+  <script>
+    // Minimal chrome.* mock backed by memory.
+    (() => {
+      const listeners = [];
+      const areas = { sync: {}, local: {} };
+      const makeArea = (name) => ({
+        async get(defaults) {
+          return { ...(defaults || {}), ...areas[name] };
+        },
+        async set(values) {
+          const changes = {};
+          Object.entries(values).forEach(([key, value]) => {
+            changes[key] = { oldValue: areas[name][key], newValue: value };
+            areas[name][key] = value;
+          });
+          listeners.forEach((fn) => fn(changes, name));
+        }
+      });
+      window.chrome = window.chrome || {};
+      window.chrome.runtime = { getURL: (path) => `../${path}?t=${Date.now()}` };
+      window.chrome.storage = {
+        sync: makeArea("sync"),
+        local: makeArea("local"),
+        onChanged: { addListener: (fn) => listeners.push(fn) }
+      };
+      listeners.push((changes, area) => {
+        if (area === "local" && changes.learnedWords) {
+          const words = Object.keys(changes.learnedWords.newValue || {});
+          document.getElementById("learned").textContent = words.length ? words.join(", ") : "none";
+        }
+      });
+      ["language", "contextMode", "reverseConvert"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", (e) => {
+          const el = e.target;
+          chrome.storage.sync.set({ [id]: el.type === "checkbox" ? el.checked : el.value });
+        });
+      });
+    })();
+  </script>
+  <script>
+    // Cache-busted, in-order load so edits show up on a plain reload.
+    ["converter.js", "detector.js", "themes.js", "content.js"].forEach((name) => {
+      const script = document.createElement("script");
+      script.src = `../scripts/${name}?t=${Date.now()}`;
+      script.async = false;
+      document.body.appendChild(script);
+    });
+  </script>
+</body>
+</html>

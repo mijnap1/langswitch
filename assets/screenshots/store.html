@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1280" />
+  <title>Store Screenshots</title>
+  <!-- Chrome Web Store screenshots, 1280x800. Render with:
+       node assets/screenshots/render.js   (needs the repo served on :8791) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --gray-1: #444;
+      --gray-2: #888;
+      --gray-3: #bbb;
+      --gray-4: #e8e8e8;
+      --gray-5: #f4f4f4;
+    }
+
+    html, body {
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      background: #ffffff;
+      color: var(--black);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .scene {
+      position: relative;
+      display: grid;
+      grid-template-columns: 470px 1fr;
+      gap: 64px;
+      align-items: center;
+      width: 1280px;
+      height: 800px;
+      padding: 0 96px;
+    }
+
+    .brand {
+      position: absolute;
+      top: 56px;
+      left: 96px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+    .eyebrow {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-2);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 56px;
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+    }
+
+    .lede {
+      font-size: 21px;
+      line-height: 1.55;
+      color: var(--gray-1);
+    }
+
+    .lede code {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-size: 19px;
+      letter-spacing: 0.04em;
+      color: var(--black);
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    .points {
+      list-style: none;
+      margin-top: 30px;
+      display: grid;
+      gap: 14px;
+      font-size: 18px;
+      color: var(--gray-1);
+    }
+
+    .points li {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .points li::before {
+      content: "";
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--black);
+      transform: translateY(-2px);
+    }
+
+    /* Right side: the demo-page section, as on the old screenshots. */
+    .panel {
+      position: relative;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1.5px solid var(--black);
+    }
+
+    .section-head h2 {
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .section-head span {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray-2);
+    }
+
+    .section-head .glyph {
+      margin-left: auto;
+      font-size: 40px;
+      font-weight: 300;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--gray-4);
+    }
+
+    .rows {
+      list-style: none;
+    }
+
+    .rows li {
+      display: grid;
+      grid-template-columns: 210px 1fr auto;
+      align-items: baseline;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--gray-4);
+    }
+
+    .rows .keys {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      color: var(--gray-2);
+    }
+
+    .rows .out {
+      font-size: 22px;
+    }
+
+    .rows .meaning {
+      font-size: 15px;
+      color: var(--gray-3);
+    }
+
+    .try-label {
+      margin-top: 30px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--gray-2);
+    }
+
+    .field {
+      display: flex;
+      align-items: flex-start;
+      height: 104px;
+      padding: 22px 24px;
+      border-radius: 12px;
+      background: var(--gray-5);
+      font-size: 22px;
+    }
+
+    .caret {
+      width: 2px;
+      height: 28px;
+      margin-left: 2px;
+      background: var(--black);
+    }
+
+    .spell {
+      text-decoration: underline wavy #e5484d;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 6px;
+    }
+
+    .tooltip {
+      position: absolute;
+      padding: 13px 22px;
+      font-size: 19px;
+      font-weight: 700;
+      font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+      letter-spacing: 0.15px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .hint {
+      position: absolute;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    /* Popup scene */
+    .popup-frame {
+      justify-self: center;
+      width: 340px;
+      height: 736px;
+      border: 0;
+      border-radius: 16px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(15, 23, 42, 0.1);
+      background: #0b0f17;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene"></div>
+
+  <script src="../../scripts/themes.js"></script>
+  <script>
+    const SCENES = {
+      korean: {
+        eyebrow: "Korean · Dubeolsik",
+        title: "Forgot to switch to 한글? It's fixed.",
+        lede: "Type on the English layout and press Space. <code>dkssudgktpdy</code> becomes 안녕하세요.",
+        points: [
+          "English stays English, Korean becomes Korean",
+          "Works the other way too: ㅗ디ㅣㅐ → hello",
+          "Backspace right away to undo"
+        ],
+        head: ["Korean", "Dubeolsik", "한"],
+        rows: [["dkssudgktpdy", "안녕하세요", "Hello"], ["sk wlrma", "나 지금", "I right now"], ["rkatkgkqslek", "감사합니다", "Thank you"]],
+        typed: "dkssudgktpdy",
+        tooltip: "Convert to: 안녕하세요"
+      },
+      chinese: {
+        eyebrow: "Chinese · Pinyin",
+        title: "Pinyin in, characters out.",
+        lede: "Type pinyin without tones and press Space. <code>nihao</code> becomes <span class=\"nowrap\">你好.</span>",
+        points: [
+          "Use v for ü: nv → 女",
+          "Chinese punctuation: nihao, → 你好，",
+          "Leaves real English words alone"
+        ],
+        head: ["Chinese", "Pinyin", "汉"],
+        rows: [["nihao", "你好", "Hello"], ["xiexie", "谢谢", "Thank you"], ["women", "我们", "We"]],
+        typed: "nihao",
+        tooltip: "Convert to: 你好"
+      },
+      japanese: {
+        eyebrow: "Japanese · Romaji",
+        title: "Romaji to kana, without the IME.",
+        lede: "Type romaji and press Space. <code>arigatou</code> becomes ありがとう.",
+        points: [
+          "Double consonants become っ: katta → かった",
+          "Japanese punctuation 、。",
+          "Kana-only mode if you skip kanji"
+        ],
+        head: ["Japanese", "Romaji", "あ"],
+        rows: [["arigatou", "ありがとう", "Thank you"], ["konnichiwa", "こんにちは", "Hello"], ["watashi", "私", "I, me"]],
+        typed: "arigatou",
+        tooltip: "Convert to: ありがとう"
+      },
+      popup: {
+        eyebrow: "Settings",
+        title: "Make it yours.",
+        lede: "Everything in one small popup, and everything stays on your device.",
+        points: [
+          "Strict, Balanced or Eager sensitivity",
+          "Turn it on or off per site",
+          "10 tooltip themes, including Liquid Glass",
+          "A list of words to never convert"
+        ]
+      }
+    };
+
+    const name = new URLSearchParams(location.search).get("scene") || "korean";
+    const data = SCENES[name];
+    const scene = document.getElementById("scene");
+
+    const copy = `
+      <div class="brand"><img src="../favicon.svg" alt="" />LangSwitch</div>
+      <div>
+        <p class="eyebrow">${data.eyebrow}</p>
+        <h1>${data.title}</h1>
+        <p class="lede">${data.lede}</p>
+        <ul class="points">${data.points.map((p) => `<li>${p}</li>`).join("")}</ul>
+      </div>`;
+
+    if (name === "popup") {
+      scene.innerHTML = copy + `<iframe class="popup-frame" id="popup" title="Popup"></iframe>`;
+      renderPopup(document.getElementById("popup"));
+    } else {
+      scene.innerHTML = copy + `
+        <div class="panel" id="panel">
+          <div class="section-head"><h2>${data.head[0]}</h2><span>${data.head[1]}</span><span class="glyph">${data.head[2]}</span></div>
+          <ul class="rows">${data.rows.map(([k, o, m]) => `<li><span class="keys">${k}</span><span class="out">${o}</span><span class="meaning">${m}</span></li>`).join("")}</ul>
+          <p class="try-label">TRY IT</p>
+          <div class="field" id="field"><span class="spell">${data.typed}</span><span class="caret"></span></div>
+        </div>`;
+      document.fonts.ready.then(placeTooltip);
+    }
+
+    function placeTooltip() {
+      const panel = document.getElementById("panel");
+      const field = document.getElementById("field");
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip";
+      tooltip.textContent = data.tooltip;
+      tooltip.style.left = "0px";
+      tooltip.style.top = `${field.offsetTop + field.offsetHeight + 10}px`;
+      panel.appendChild(tooltip);
+      window.LangSwitchThemes.apply(tooltip, "liquid-glass", false);
+      document.body.dataset.ready = "1";
+    }
+
+    // The real popup, with its settings mocked.
+    async function renderPopup(frame) {
+      const base = new URL("../../ui/", location.href).href;
+      const html = await (await fetch(`${base}popup.html`)).text();
+      const mock = `<base href="${base}"><script>
+        const store = {
+          sync: { language: "korean", contextMode: "balanced", tooltipTheme: "liquid-glass", appearance: "auto" },
+          local: { learnedWords: { lol: 3, gg: 2, brb: 1 } }
+        };
+        const area = (n) => ({ get: async (d) => ({ ...(d || {}), ...store[n] }), set: async (v) => Object.assign(store[n], v) });
+        window.chrome = {
+          runtime: { getManifest: () => ({ version: "0.3.0" }) },
+          tabs: { query: async () => [{ url: "https://docs.google.com/document/d/1" }] },
+          storage: { sync: area("sync"), local: area("local") }
+        };
+      <\/script>`;
+      frame.srcdoc = html.replace("<head>", `<head>${mock}`).replace(/<meta name="color-scheme"[^>]*>/, "");
+      frame.addEventListener("load", () => {
+        frame.contentDocument.documentElement.style.colorScheme = "dark";
+        setTimeout(() => { document.body.dataset.ready = "1"; }, 400);
+      });
+    }
+  </script>
+</body>
+</html>

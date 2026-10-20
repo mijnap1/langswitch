@@ -37,6 +37,12 @@
   const VOWEL_INDEX = Object.fromEntries(VOWELS.map((c, i) => [c, i]));
   const TAIL_INDEX = Object.fromEntries(TAILS.map((c, i) => [c, i]));
 
+  // Reverse tables for Hangul -> Dubeolsik key sequence.
+  const JAMO_TO_KEY = Object.fromEntries(Object.entries(KEY_TO_JAMO).map(([key, jamo]) => [jamo, key]));
+  const SPLIT_JAMO = Object.fromEntries(
+    Object.entries({ ...COMBINED_VOWELS, ...COMBINED_TAILS }).map(([pair, combined]) => [combined, pair])
+  );
+
   const CHINESE_PINYIN_MAP = {
     ni: "你", hao: "好", ma: "吗", wo: "我", ai: "爱", ta: "他", men: "们",
     shi: "是", de: "的", bu: "不", zai: "在", you: "有", hen: "很", xiang: "想",
@@ -318,6 +324,31 @@
     return out;
   }
 
+  function jamoToKeys(jamo) {
+    if (!jamo) return "";
+    if (JAMO_TO_KEY[jamo]) return JAMO_TO_KEY[jamo];
+    const pair = SPLIT_JAMO[jamo];
+    if (pair) return Array.from(pair).map((j) => JAMO_TO_KEY[j] || j).join("");
+    return jamo;
+  }
+
+  // Inverse of composeFromJamo: "ㅗ디ㅣㅐ" -> "hello". Non-Hangul chars pass through.
+  function hangulToKeys(text) {
+    let out = "";
+    for (const ch of text) {
+      const code = ch.charCodeAt(0);
+      if (code >= 0xac00 && code <= 0xd7a3) {
+        const offset = code - 0xac00;
+        out += jamoToKeys(LEADS[Math.floor(offset / 588)]);
+        out += jamoToKeys(VOWELS[Math.floor((offset % 588) / 28)]);
+        out += jamoToKeys(TAILS[offset % 28]);
+      } else {
+        out += jamoToKeys(ch);
+      }
+    }
+    return out;
+  }
+
   function convertToKorean(input) {
     const normalized = input.toLowerCase().replace(/[^a-z]/g, "");
     if (normalized) {
@@ -369,16 +400,17 @@
     return input.toLowerCase().replace(/[^a-z]/g, "");
   }
 
-  function convertToJapanese(input) {
+  // kanaOnly: skip the word dictionary (私) and spell it out in hiragana (わたし).
+  function convertToJapanese(input, { kanaOnly = false } = {}) {
     const normalized = normalizeRomaji(input);
     if (!normalized) return input;
 
-    const direct = getTopRuntimeCandidate("japanese", normalized);
+    const direct = kanaOnly ? null : getTopRuntimeCandidate("japanese", normalized);
     if (direct) {
       return direct;
     }
 
-    const jpKeys = getRuntimeKeysSorted("japanese", JAPANESE_ROMAJI_KEYS);
+    const jpKeys = kanaOnly ? [] : getRuntimeKeysSorted("japanese", JAPANESE_ROMAJI_KEYS);
     let i = 0;
     let out = "";
     while (i < normalized.length) {
@@ -423,10 +455,10 @@
     return out || input;
   }
 
-  function convertWithLanguage(input, language) {
+  function convertWithLanguage(input, language, options = {}) {
     switch (language) {
       case "japanese":
-        return convertToJapanese(input);
+        return convertToJapanese(input, options);
       case "chinese":
         return convertToChinese(input);
       case "korean":
@@ -442,4 +474,5 @@
 
   window.convertToKorean = convertToKorean;
   window.convertWithLanguage = convertWithLanguage;
+  window.hangulToKeys = hangulToKeys;
 })();
